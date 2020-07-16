@@ -1,0 +1,54 @@
+Trivia html idea: 
+submit up to 3 questions - the more you submit, the more questions you will definitely get correct!
+
+[form to submit questions](try first with one question)
+"question"
+answer a 
+answer b 
+answer c 
+answer d 
+
+
+---> take this data 
+---> create sheet with all questions and options (release one at a time?)
+- similar to the javascript interaction - but not in real-time? 
+- create a password so bots can't create trivia questions? (or randos)
+
+[form to submit answer]
+-> reveal answer 
+
+Keep track of points individually
+- have them enter name or team name 
+- create drop-down list of team names
+
+
+- compile submittals - compare to correct answer
+if correct_answer === selected_answer
+- display correct answer
+- display bar graphs of who selected which answer
+
+Later:  
+- point tracker 
+- scrambling questions
+- scrambling answers
+
+
+google: backend framework - express? django? flask (smaller, simpler)/ database (mysql or postgres)
+
+
+express.js w node.js
+nodemon  - watches all files, and restarts your application when any of them change #pandu ?
+
+node fs core module - for interacting with the File System
+
+const fs = require('fs')
+fs.readFile('./file.txt', 'utf-8', readDataCallback);
+fs.write
+
+
+
+
+
+
+
+

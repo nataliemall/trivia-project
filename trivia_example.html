@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<style>
+
+.bigText{
+  font-size: 20em;
+  font-family: Impact;
+}
+</style>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    <title>HTML Forms</title>
+  </head>
+  <body>
+    <section id="overlay">
+
+<!--       <div class = "bigText"> 
+        <p>presenting</p>
+        <br>
+        <p>Cousin</p>
+      </div> -->
+      <br>
+      <!-- <hr>   -->
+      <!--#pandu how do I make a better break -->
+      <img src="https://alexandrialivingmagazine.com/downloads/2484/download/Trivia%20Night%20Logo.jpg?cb=d8bcce6707e7d210ac1b382dd3895118&amp;w=1500&amp;h= 1500w" alt="Trivia Logo" id="logo">
+      <hr>
+      <!--Add your code below-->
+      
+      
+    </section>
+    
+
+    <form action="submission.html" method="POST">
+
+    <section class = "gen_info">
+      <label for = "name">What's your name?</label>
+      <input type = "text" name = "name" value = "example: Gabi" id = "name" maxlength= "20"> <!-- pattern = "[a-zA-Z]+" --> 
+    </section>
+    <section class = "question1">
+    <h1>Type in your trivia question here:</h1>  
+
+    <label for = "question_submission"> 1st trivia question:</label>
+    <textarea id="extra" name="extra" rows="3" cols="40"></textarea>
+<!--     <input type = "text" name = "trivia_question" value = "example: Who is your favorite cousin?" id = "question_submission"> -->
+
+    <hr>
+    <label for = "answerA">Answer A:</label>
+    <input type = "text" name = "first_answer" value = "type answer here" id = "answerA">
+
+    <hr>    <!-- #pandu how do I make line breaks-->
+   
+   <hr>
+    <label for = "answerB">Answer B:</label>
+    <input type = "text" name = "second_answer" value = "type answer here" id = "answerB">
+
+    <hr> 
+
+   <hr>
+    <label for = "answerC">Answer C:</label>
+    <input type = "text" name = "third_answer" value = "type answer here" id = "answerC">
+
+    <hr> 
+
+   <hr>
+    <label for = "answerD">Answer D:</label>
+    <input type = "text" name = "fourth_answer" value = "type answer here" id = "answerC">
+
+    <hr> 
+
+    </section>
+
+    <hr>
+    <label for = "correct_answer">letter of correct answer:</label>
+    <select name = "correct_answer" id = "correct_answer">
+      <option value = "A">A</option>
+      <option value = "B">B</option>
+      <option value = "C">C</option>
+      <option value = "D">D</option>
+    </select>
+
+    <hr> 
+
+    <section class="submission">
+      <input type="submit" value="Submit">
+    </section>
+
+    </form>
+  </body>
+</html>
