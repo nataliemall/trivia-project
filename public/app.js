@@ -1,12 +1,8 @@
-//triva-crowds
+const http = require('http');
+let {requestListener} = require('./callbackFile.js');
+const PORT = process.env.PORT || 4000; //changed from 4001 to 4004 
 
-
-console.log('hello from the client side')
-// const http = require('http');
-// let {requestListener} = require('./server.js');
-// // const PORT = process.env.PORT || 4000; //changed from 4001 to 4004 
-
-// var server = http.createServer(requestListener)
+var server = http.createServer(requestListener)
 
 // server.listen(PORT)
 
