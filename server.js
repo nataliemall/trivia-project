@@ -36,11 +36,11 @@ const pool = new Pool({
   }
 });
 
-// app.use(express.json()) // for parsing application/json
+app.use(express.json()) // for parsing application/json
 
-// let router = require('express').Router();
-// let bodyParser = require('body-parser');
-// router.use(bodyParser.json());
+let router = require('express').Router();
+let bodyParser = require('body-parser');
+router.use(bodyParser.json());
 
 
 // const PORT = process.env.PORT || 4002;
@@ -65,6 +65,39 @@ try {
 })
 
 
+app.put('/table_update/', async (req, res) => {
+// await fakeNetworkDelay();
+
+  try {
+    const client = await pool.connect();
+
+    //select the current 
+    const message = req.body.mykey; //"${message}"
+    console.log('message', message);
+
+    var id = 7;
+    var name = message;
+    let sql = 'INSERT INTO test_table (id, name) VALUES ($1, $2)';
+    let params = [ id, name ];
+
+//     client.query(sql, params, function(err) {
+// // make sure you handle errors from here as well,
+// // including signaling `res` and `done`
+// }); 
+
+    res.send( "sent" );  // do we actually want to send anything?
+    client.release(); //changed from 'release' to 'end'
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  } 
+
+      
+    });
+
+
+
+//port listening, which happens once at the end of the code 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
