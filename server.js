@@ -64,6 +64,9 @@ try {
 } 
 })
 
+app.get('/somewhere_else/', async (req, res) => {
+  console.log('Here we will place the confirmation page')
+})
 
 app.put('/table_update/', async (req, res) => {
 // await fakeNetworkDelay();
@@ -102,7 +105,9 @@ app.put('/table_update/', async (req, res) => {
 
       
     });
-
+app.get('/thanks/', async (req, res) => {
+  console.log('thank you for your submission')
+})
 
 
 //port listening, which happens once at the end of the code 
