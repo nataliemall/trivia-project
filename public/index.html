@@ -36,40 +36,42 @@
     </section>
     
 
-    <!-- <form action="submission.html" method="POST">   intersting. Pandu how would this be possible from the html page?! -->
+    <form> 
+     <!-- action="submission.html" method="POST">    -->
+      <!-- intersting. Pandu how would this be possible from the html page?! -->
 
     <section class = "gen_info">
       <label for = "name">What's your name?</label>
-      <input type = "text" required name = "name" value = "example: Gabi" id = "name" maxlength= "20"> <!-- pattern = "[a-zA-Z]+" --> 
+      <input type = "text" required name = "name" id = "name" maxlength= "20"> <!-- pattern = "[a-zA-Z]+" --> 
     </section>
     <section class = "question1">
     <h1>Type in your trivia question here:</h1>  
 
     <label for = "question_submission"> 1st trivia question:</label>
-    <textarea id="q1" name="q1" rows="3" cols="40" maxlength="200"></textarea>
+    <textarea id="q1" required name="q1" rows="3" cols="40" maxlength="200"></textarea>
 <!--     <input type = "text" name = "trivia_question" value = "example: Who is your favorite cousin?" id = "question_submission"> -->
 
     <hr>
     <label for = "answerA">Answer A:</label>
-    <input type = "text" required name = "first_answer" value = "type answer here" id = "answerA" maxlength = "40">
+    <input type = "text" required name = "anteater" id = "answerA" maxlength = "40">
 
     <hr>    <!-- #pandu how do I make line breaks-->
    
    <hr>
     <label for = "answerB">Answer B:</label>
-    <input type = "text" required name = "second_answer" value = "type answer here" id = "answerB" maxlength = "40">
+    <input type = "text" required name = "blobfish" id = "answerB" maxlength = "40">
 
     <hr> 
 
    <hr>
     <label for = "answerC">Answer C:</label>
-    <input type = "text" name = "third_answer" value = "type answer here" id = "answerC" maxlength = "40">
+    <input type = "text" name = "chipmunk" id = "answerC" maxlength = "40">
 
     <hr> 
 
    <hr>
     <label for = "answerD">Answer D:</label>
-    <input type = "text" name = "fourth_answer" value = "type answer here" id = "answerD" maxlength = "40">
+    <input type = "text" name = "dingo" id = "answerD" maxlength = "40">
 
     <hr> 
 
@@ -86,11 +88,15 @@
 
     <hr> 
 
+    <!-- Start Time: <input type="hidden" name="starttime" id="starttime"> -->
+
     <section class="submission">
+     <!--  <input type="submit" onclick="return confirm('Are you sure? (last chance to make edits!) ')" value="Submit" id = 'submit_button'/> -->
+     <!-- include above statement once the app goes leaves beta mode -->
       <input type="submit" value="Submit" id = 'submit_button'>
     </section>
 
-    <!-- </form> -->
+    </form>
 
     <script src = 'app.js'></script>
 

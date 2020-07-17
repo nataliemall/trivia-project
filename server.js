@@ -72,6 +72,7 @@ app.put('/table_update/', async (req, res) => {
     const client = await pool.connect();
 
     //select the current 
+    const name = req.body.name;
     const question = req.body.mykey; //"${message}"
     const answerA = req.body.answerA;
     const answerB = req.body.answerB;
@@ -80,12 +81,12 @@ app.put('/table_update/', async (req, res) => {
     const correct_answer = req.body.correctAnswer;
 
     console.log('message', question);
-    console.log('answers', answerA, answerB, answerC, answerD, correct_answer);
+    console.log('answers', name, answerA, answerB, answerC, answerD, correct_answer);
 
     var id = 7;
-    var name = question;
-    let sql = 'INSERT INTO trivia_questions (question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6)';
-    let params = [ name, answerA, answerB, answerC, answerD, correct_answer ];
+    // var name = question;
+    let sql = 'INSERT INTO trivia_questions (name, question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6, $7)';
+    let params = [ name, question, answerA, answerB, answerC, answerD, correct_answer ];
 
     client.query(sql, params, function(err) {
 // make sure you handle errors from here as well,

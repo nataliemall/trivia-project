@@ -15,6 +15,7 @@ submit_button.addEventListener('click', () => {
 
     // const jsonstring2 = '{"mykey": "' + (document.getElementById('happy_thought').value) + '"}'; //this worked
 
+    const name = document.getElementById('name').value;
     const QValue = document.getElementById('q1').value;
     const a1 = document.getElementById('answerA').value;
     const a2 = document.getElementById('answerB').value;
@@ -22,7 +23,7 @@ submit_button.addEventListener('click', () => {
     const a4 = document.getElementById('answerD').value;
     const correctAnswer = document.getElementById('correct_answer').value
 
-    const mykey2 = { "mykey" : QValue, "answerA" : a1, "answerB" : a2, 
+    const mykey2 = { "name" : name, "mykey" : QValue, "answerA" : a1, "answerB" : a2, 
     "answerC": a3, "answerD" :a4, "correctAnswer" : correctAnswer }
 
     console.log(QValue)
@@ -56,6 +57,12 @@ submit_button.addEventListener('click', () => {
       console.log('test FETCH');
       // refreshDisplay();
     });
+
+    fetch('/thanks/', {
+      method: 'GET'
+      // console.log('thank you on the client side here')
+    });
+
 
     console.log('TEST');
 })
