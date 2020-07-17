@@ -72,18 +72,25 @@ app.put('/table_update/', async (req, res) => {
     const client = await pool.connect();
 
     //select the current 
-    const message = req.body.mykey; //"${message}"
-    console.log('message', message);
+    const question = req.body.mykey; //"${message}"
+    const answerA = req.body.answerA;
+    const answerB = req.body.answerB;
+    const answerC = req.body.answerC;
+    const answerD = req.body.answerD;
+    const correct_answer = req.body.correctAnswer;
+
+    console.log('message', question);
+    console.log('answers', answerA, answerB, answerC, answerD, correct_answer);
 
     var id = 7;
-    var name = message;
-    let sql = 'INSERT INTO test_table (id, name) VALUES ($1, $2)';
-    let params = [ id, name ];
+    var name = question;
+    let sql = 'INSERT INTO trivia_questions (question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6)';
+    let params = [ name, answerA, answerB, answerC, answerD, correct_answer ];
 
-//     client.query(sql, params, function(err) {
-// // make sure you handle errors from here as well,
-// // including signaling `res` and `done`
-// }); 
+    client.query(sql, params, function(err) {
+// make sure you handle errors from here as well,
+// including signaling `res` and `done`
+    }); 
 
     res.send( "sent" );  // do we actually want to send anything?
     client.release(); //changed from 'release' to 'end'
