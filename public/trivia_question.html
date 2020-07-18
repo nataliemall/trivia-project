@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<!-- trivia-crowd html  -->
+
+<style>
+
+
+.bigText{
+  font-size: 20em;
+  font-family: Impact;
+}
+</style>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    <title>HTML Forms</title>
+  </head>
+  <body>
+
+<section class = "gen_info">
+  <label for = "name">Find your name here</label>
+  <input type="text" name="player_name" id="player_name" maxlength="20"> <!-- pattern = "[a-zA-Z]+" --> 
+</section>
+
+<h2> Submit your best guess to the following trivia question: </h2>
+
+<div id = "current_question">
+	Question:
+</div>
+
+
+
+<section class="submission">
+  <input type="submit" value="Submit" id = 'submit_button'>
+</section>
+
+
+	<script src = 'trivia_question.js'></script>
+  </body>
+</html>
+
+
+
