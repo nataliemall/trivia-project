@@ -19,25 +19,66 @@
   </head>
   <body>
 
+<form action="/results.html" method="PUT"> 
+    <!-- to put above in place once the submit-button query has been figured out  -->
+<!-- <form onsubmit="return false"> -->
+<!-- <form> -->
+
+
 <section class = "gen_info">
-  <label for = "name">Find your name here</label>
+  <label for = "name">Enter your name here</label>
+  <!-- Will eventually be a drop-down menu -->
   <input type="text" name="player_name" id="player_name" maxlength="20"> <!-- pattern = "[a-zA-Z]+" --> 
 </section>
 
 <h2> Submit your best guess to the following trivia question: </h2>
 
 <div id = "current_question">
-	Question:
+    Question:
 </div>
 
 
+<section class="options">
+    <input type="radio" name="options" id="optiona" value="TestA"  />  
+    <label for="optiona">A</label>
+    <br>
+    <input type="radio" name="options" id = "optionb" value="TestB" />
+    <label for="optionb">B</label>
+    <br>
+    <input type="radio" name="options" id = "optionc" value="TestC" />
+    <label for="optionc">C</label>
+    <br>
+    <input type="radio" name="options" id = "optiond" value="TestD" />
+    <label for="optiond">D</label>
+    <br>
+
+</section>
 
 <section class="submission">
   <input type="submit" value="Submit" id = 'submit_button'>
 </section>
 
+<br>
+<br>
+Question ref num:
+<div id = "question_ref_num">
+    id:
+    <!-- make this invisible later -->
+</div>
 
-	<script src = 'trivia_question.js'></script>
+</form>
+
+<!-- <form action="/results.html" method="PUT"> 
+
+    
+<section class="submission">
+  <input type="submit" value="See how you did" id = 'submit_button'> 
+</section>
+</form>
+ -->
+<!-- two buttons are needed because submitting a form redirects -->
+
+    <script src = 'trivia_question.js'></script>
   </body>
 </html>
 

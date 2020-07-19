@@ -87,19 +87,67 @@ app.put('/table_update/', async (req, res) => {
 app.get('/retrieve_question/', async (req, res) => {
 
   try{
-    const client = await pool.connect();
 
-    var question_id = 8;
+    var question_id = 8;  //here's where the question is chosen 
+
     let sql = 'SELECT (question) FROM  trivia_questions WHERE id = $1';
+    let sql1 = 'SELECT (answera) FROM  trivia_questions WHERE id = $1';
+    let sql2 = 'SELECT (answerb) FROM  trivia_questions WHERE id = $1';
+    let sql3 = 'SELECT (answerc) FROM  trivia_questions WHERE id = $1';
+    let sql4 = 'SELECT (answerd) FROM  trivia_questions WHERE id = $1';
+
+
+
+    // let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
+    // let params11 = [ref_num];
+    // console.log(params11)
+    // const  { rows: test11 } = await client11.query(sql11, params11)
+
+
+    let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
     let params = [question_id];
 
+    const client = await pool.connect();
     const { rows: name } = await client.query(sql, params)
-      console.log('result:', name)
-    
+    client.release();
 
+    const client1 = await pool.connect();
+    const { rows: name1 } = await client1.query(sql1, params)
+    client1.release();
 
-    let answers = 'SELECT (answera) FROM  trivia_questions WHERE id = $1';
-    let params2 = [question_id];
+    const client2 = await pool.connect();
+    const { rows: name2 } = await client2.query(sql2, params)
+    client2.release();
+
+    const client3 = await pool.connect();
+    const { rows: name3 } = await client3.query(sql3, params)
+    client3.release();
+
+    const client4 = await pool.connect();
+    const { rows: name4 } = await client4.query(sql4, params)
+    client4.release();
+
+    const client5 = await pool.connect();
+    const { rows: name5 } = await client5.query(sql5, params)
+    client5.release();    
+
+    var name_unbracketed = name[0];
+    var name1_unbracketed = name1[0];
+    var name2_unbracketed = name2[0];
+    var name3_unbracketed = name3[0];
+    var name4_unbracketed = name4[0];
+    var name5_unbracketed = name5[0];
+
+    // var question_mid = JSON.stringify({'id' : question_id});
+    // console.log('question_mid', question_mid);
+    // var id_unbracketed = JSON.parse(question_mid);
+    // console.log('id_unbracketed', id_unbracketed);
+
+    var combined_sender = Object.assign(name5_unbracketed, name_unbracketed, name1_unbracketed, name2_unbracketed, name3_unbracketed, name4_unbracketed);
+    console.log('combined', combined_sender); 
+    // console.log('result:', name, name2);
+
+    // let params2 = [question_id];
 
     // client.query(answers, params2).then(res => {
     // const result_answers = res.rows;
@@ -112,8 +160,8 @@ app.get('/retrieve_question/', async (req, res) => {
     // let bodyParser = require('body-parser');
     // router.use(bodyParser.json());
     // console.log('res send thing', result_answers)
-    res.send(name);
-    client.release();
+    res.send(combined_sender);
+    
   } catch (err) {
         console.error(err);
         res.send("Error " + err);
@@ -130,7 +178,7 @@ app.get('/retrieve_question/', async (req, res) => {
   // console.log('current question:', current_question)
   // res.send('question sent')
 
-  console.log('querry retrieval:', sql)
+  // console.log('querry retrieval:', sql)
   console.log('test retrieve question')
 })
 
@@ -169,8 +217,94 @@ app.put('/retrieve_question/', async (req, res) => {
     });
 
 
+app.put('/guess_update/', async (req, res) => {
+// await fakeNetworkDelay();
+
+  try {
+    const client = await pool.connect();
+
+    //select the current 
+    const name = req.body.name;
+    // const player_answer = req.body.player_answer; //"${message}"
+    const guess = req.body.guess;
+    const ref_num = req.body.ref_num;
 
 
+    // console.log('message', question);
+    console.log('player guess', name, guess, ref_num);
+
+    // var id = 7;
+    // var name = question;
+    let sql10 = 'INSERT INTO player_guesses (name, guess, question) VALUES ($1, $2, $3)';
+    let params = [ name, guess, ref_num ];
+
+    client.query(sql10, params, function(err) {
+// make sure you handle errors from here as well,
+// including signaling `res` and `done`
+    }); 
+
+
+    client.release(); //changed from 'release' to 'end'
+
+    const client11 = await pool.connect();
+    let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
+    let params11 = [ref_num];
+    console.log(params11);
+    const  { rows: test11 } = await client11.query(sql11, params11);
+
+    console.log('test11', test11[0]);
+    var answer_key = test11[0];
+    var correct_answer = answer_key.correctanswer
+    client.release(); //changed from 'release' to 'end'
+
+    if (correct_answer == guess) {
+      console.log('answer was correct! direct to results page')
+      const client12 = await pool.connect();
+      // let sql12 = 'UPDATE (points) FROM player_guesses WHERE id = $1'
+      let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1';
+      // let params11 = [ref_num];
+      client12.query(sql12, params11);
+
+
+      console.log(params11);
+
+      var current_grade = 'correct';
+      //thing to do if correct answer 
+    } else {
+      console.log('answer incorrect');
+      var current_grade = 'incorrect';
+    } 
+    var current_grade_string = JSON.stringify({grade :current_grade});
+    console.log('grade string', current_grade_string);
+    res.send( current_grade_string );  // do we actually want to send anything?
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  } 
+
+      
+    });
+
+app.get('/score/', async (req, res) => {
+  try {
+    const client13 = await pool.connect();
+    let sql13 = 'SELECT (points) FROM player_guesses WHERE question = $1'; //needs to update according to question
+    params = ['8']
+    const { rows: name13 } = await client13.query(sql13, params);
+
+    
+    console.log(name13[0]);
+
+    client13.release();
+    var player_name = name13[0];
+
+    player_name_json = JSON.stringify({name: player_name});
+    res.send(player_name_json);
+  } catch (err) {
+    console.error(err);
+    res.send("Error " + err);
+  } 
+})
 
 
 // app.get('/thanks/', async (req, res) => {
