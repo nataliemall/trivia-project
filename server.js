@@ -64,7 +64,7 @@ app.put('/table_update/', async (req, res) => {
     console.log('message', question);
     console.log('answers', name, answerA, answerB, answerC, answerD, correct_answer);
 
-    var id = 7;
+    // var id = 7;
     // var name = question;
     let sql = 'INSERT INTO trivia_questions (name, question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     let params = [ name, question, answerA, answerB, answerC, answerD, correct_answer ];
@@ -288,17 +288,19 @@ app.put('/guess_update/', async (req, res) => {
 app.get('/score/', async (req, res) => {
   try {
     const client13 = await pool.connect();
-    let sql13 = 'SELECT (points) FROM player_guesses WHERE question = $1'; //needs to update according to question
+    let sql13 = 'SELECT * FROM player_guesses WHERE question = $1'; //needs to update according to question
     params = ['8']
     const { rows: name13 } = await client13.query(sql13, params);
 
     
-    console.log(name13[0]);
+    console.log('most recent guess', name13[0]);  //shouldn't the query have all the player_guesses?
+    // console.log('player guesses', name13);
 
     client13.release();
     var player_name = name13[0];
 
-    player_name_json = JSON.stringify({name: player_name});
+    // player_name_json = JSON.stringify({name: player_name});
+    player_name_json = JSON.stringify(name13);
     res.send(player_name_json);
   } catch (err) {
     console.error(err);

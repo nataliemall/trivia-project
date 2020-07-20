@@ -19,9 +19,10 @@
   </head>
   <body>
 
-<form action="/results.html" method="PUT"> 
+
+<!-- <form action="/results.html" method="PUT">  -->
     <!-- to put above in place once the submit-button query has been figured out  -->
-<!-- <form onsubmit="return false"> -->
+<form onsubmit="return false">
 <!-- <form> -->
 
 
@@ -32,6 +33,15 @@
 </section>
 
 <h2> Submit your best guess to the following trivia question: </h2>
+
+<div id = "form_body" style="
+    padding: 20px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: blue;
+    border-radius: 25px;
+    ">
+
 
 <div id = "current_question">
     Question:
@@ -58,25 +68,21 @@
   <input type="submit" value="Submit" id = 'submit_button'>
 </section>
 
+</div>
+
 <br>
 <br>
-Question ref num:
-<div id = "question_ref_num">
+<p style="color:#F6F6F2;">Question ref num:</p>
+
+<div id = "question_ref_num" style="color:#F6F6F2;">
+<!--     <style>
+
+    </style> -->
     id:
     <!-- make this invisible later -->
 </div>
 
 </form>
-
-<!-- <form action="/results.html" method="PUT"> 
-
-    
-<section class="submission">
-  <input type="submit" value="See how you did" id = 'submit_button'> 
-</section>
-</form>
- -->
-<!-- two buttons are needed because submitting a form redirects -->
 
     <script src = 'trivia_question.js'></script>
   </body>

@@ -1,12 +1,9 @@
 //triva-crowds
 
-
 console.log('hello from the client side')
 
 const q1 = document.getElementById('q1');
 const submit_button = document.getElementById('submit_button');
-
-
 
 
 submit_button.addEventListener('click', () => {
@@ -62,7 +59,6 @@ submit_button.addEventListener('click', () => {
       method: 'GET'
       // console.log('thank you on the client side here')
     });
-
 
     console.log('TEST');
 })
