@@ -34,10 +34,10 @@ function displayMessage(message1) {
 
 //hacky way don't judge me
   console.log('results message', message1); //this currently returns entire database for Question #8
-  console.log('updated', message1.points);
+  // console.log('updated', message1.points);
   console.log('updated name', message1.name);
-  // Pandu halp.  
-  console.log(message1.name.points)
+  // Pandu halp.  - us ID doh
+  // console.log(message1.name.points)
 
   // if (player_letter == 'TestA') {
   //   console.log('player is correct');
@@ -56,10 +56,10 @@ function displayMessage(message1) {
   // console.log('results message', message1);
   // console.log(message1.name.points)
 
-  if (message1.name.points == 1) {
+  if (message1.name == 1) {
     console.log('player is correct');
     document.getElementById("myImg").src = "happykitty.gif";
-  } else if (message1.name == 0) {
+  } else if (message1 == 0) {
     console.log('player is incorrect');
     document.getElementById("myImg").src ="Pouty Yellow Cat GIF.gif"
   } 

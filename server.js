@@ -238,13 +238,44 @@ app.put('/guess_update/', async (req, res) => {
     let sql10 = 'INSERT INTO player_guesses (name, guess, question) VALUES ($1, $2, $3)';
     let params = [ name, guess, ref_num ];
 
-    client.query(sql10, params, function(err) {
+    await client.query(sql10, params, function(err) {
 // make sure you handle errors from here as well,
 // including signaling `res` and `done`
     }); 
 
-
     client.release(); //changed from 'release' to 'end'
+
+
+
+    const client2 = await pool.connect();
+    let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
+
+    const  temp  = await client.query(sql14, params );
+
+
+    console.log('temp', temp.rows)
+    //add error catch here for if more than one ID comes up (i.e. answered twice)
+    var temp_ids = temp.rows[0];
+    console.log('temp_ids', temp_ids)
+    var guess_id_formatted = temp_ids.id;
+    // console.log('id_val', guess_id_formatted);
+
+    // const {id: test12} = temp.rows;
+
+//     const  {id: test12}  = await client.query(sql14, params, function(err) {
+// // make sure you handle errors from here as well,
+// // including signaling `res` and `done`
+//     });  
+
+    // console.log("test12", test12);
+    // var guess_id = test12[0];
+    // var guess_id_formatted = guess_id.id;  
+    client2.release();
+    console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
+    //send guess_id along to the front end - then use this to extract the correct eval
+
+
+
 
     const client11 = await pool.connect();
     let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';

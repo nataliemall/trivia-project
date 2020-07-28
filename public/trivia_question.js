@@ -95,6 +95,11 @@ submit_button.addEventListener('click', () => {
     const bobcatStr = JSON.stringify(mykey2);
     console.log(bobcatStr);
 
+    var nameParam = name;
+    var questionParam = ref_num2;
+    var guessParam = player_answer;
+
+
     fetch('/guess_update/', {
       method: 'PUT',
       body: bobcatStr,
@@ -102,7 +107,10 @@ submit_button.addEventListener('click', () => {
       'Content-Type': 'application/json'
       } 
       }
-      ) //is there a way to get the res.send file from this? 
+      ).then( () => {
+          window.location.href = 
+          "/results.html?Page=data&name=" + nameParam + "&question=" 
+          + questionParam + "&guess=" + guessParam ; }) //is there a way to get the res.send file from this? 
 
     // fetch('/')
       // ).then(result => result.json())
@@ -114,10 +122,6 @@ submit_button.addEventListener('click', () => {
     // window.location.href = "http://trivia_.com";
     // window.location.href = '/results.html'; //relative to domain
 
-    var nameParam = name;
-    var questionParam = ref_num2;
-    var guessParam = player_answer;
-    window.location.href ="/results.html?Page=data&name=" + nameParam + "&question=" + questionParam + "&guess=" + guessParam ;
 
     console.log('href location')
 
