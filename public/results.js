@@ -15,6 +15,7 @@ const urlParams = new URLSearchParams(queryString);
 const player_name = urlParams.get('name');
 const player_guess = urlParams.get('guess');
 const current_question = urlParams.get('question');
+const player_eval = urlParams.get('player_eval');
 
 console.log(player_name, player_guess, current_question);
 
@@ -30,6 +31,7 @@ function refreshDisplay() {
 }
 
 
+
 function displayMessage(message1) {   
 
 //hacky way don't judge me
@@ -39,16 +41,16 @@ function displayMessage(message1) {
   // Pandu halp.  - us ID doh
   // console.log(message1.name.points)
 
-  // if (player_letter == 'TestA') {
-  //   console.log('player is correct');
-  //   document.getElementById("myImg").src = "happykitty.gif";
-  //   document.getElementById("evaluation").innerHTML = 'Correct!'
-  // } else {
-  //   console.log('player is incorrect');
-  //   document.getElementById("myImg").src ="Pouty Yellow Cat GIF.gif"
-  //   document.getElementById("evaluation").innerHTML = 'Sorry, better luck next time!'
+  if (player_eval == 'correct') {
+    console.log('player is correct');
+    document.getElementById("myImg").src = "happykitty.gif";
+    document.getElementById("evaluation").innerHTML = 'Correct!'
+  } else {
+    console.log('player is incorrect');
+    document.getElementById("myImg").src ="Pouty Yellow Cat GIF.gif"
+    document.getElementById("evaluation").innerHTML = 'Sorry, better luck next time!'
 
-  // } 
+  } 
 
 
   // This will be the real way once the database updated upon submission 

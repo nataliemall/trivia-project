@@ -17,9 +17,13 @@ function refreshDisplay() {
     .catch(error => console.log('There was an error', error));
 }
 
+var player_eval = 'test';
 function wasitcorrect(data){
     console.log('put the function here');
     console.log('wasitcorrect', data);
+    var player_eval = data['grade'];
+    console.log('player_eval:', player_eval);
+    return player_eval;
 
     // fetch('/results.html', {method: 'GET'}) //this doesn't work 
 }
@@ -107,10 +111,13 @@ submit_button.addEventListener('click', () => {
       'Content-Type': 'application/json'
       } 
       }
-      ).then( () => {
+      ).then(result => result.json())
+        .then(data => wasitcorrect(data))
+        .then(console.log('wasitcorrect has passed'))
+        .then( (player_eval) => {
           window.location.href = 
           "/results.html?Page=data&name=" + nameParam + "&question=" 
-          + questionParam + "&guess=" + guessParam ; }) //is there a way to get the res.send file from this? 
+          + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval; }) //is there a way to get the res.send file from this? 
 
     // fetch('/')
       // ).then(result => result.json())

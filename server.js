@@ -258,6 +258,8 @@ app.put('/guess_update/', async (req, res) => {
     var temp_ids = temp.rows[0];
     console.log('temp_ids', temp_ids)
     var guess_id_formatted = temp_ids.id;
+
+
     // console.log('id_val', guess_id_formatted);
 
     // const {id: test12} = temp.rows;
@@ -271,6 +273,17 @@ app.put('/guess_update/', async (req, res) => {
     // var guess_id = test12[0];
     // var guess_id_formatted = guess_id.id;  
     client2.release();
+
+    //use below to update second table if needed
+    // const client_insert_current_guess = await pool.connect();
+
+    // let sql_current = 'INSERT INTO recent_guesses (name, guess, question) VALUES ($1, $2, $3)';
+    // const temp2 = await client_insert_current_guess.query() ...
+
+    // client_insert_current_guess,release();
+
+
+
     console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
     //send guess_id along to the front end - then use this to extract the correct eval
 
