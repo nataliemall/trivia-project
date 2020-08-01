@@ -221,18 +221,35 @@ app.put('/guess_update/', async (req, res) => {
 // await fakeNetworkDelay();
 
   try {
-    const client = await pool.connect();
 
     //select the current 
     const name = req.body.name;
     // const player_answer = req.body.player_answer; //"${message}"
     const guess = req.body.guess;
     const ref_num = req.body.ref_num;
-
-
     // console.log('message', question);
     console.log('player guess', name, guess, ref_num);
 
+
+    
+    const dub_submission_check = await pool.connect();
+
+
+   	// let name_nat = 'Natalie';
+    let sql_check = 'SELECT * FROM player_guesses WHERE name = $1';
+    let name_nat_param = [ name ];   
+    await dub_submission_check.query(sql_check, name_nat_param, function(err, results) {
+    	
+    	console.log('submission_selection', results.rows[0]);
+// make sure you handle errors from here as well,
+// including signaling `res` and `done`
+    }); 
+
+    // console.log('submission_selection', submission_selection)
+    dub_submission_check.release();
+
+
+    const client = await pool.connect();
     // var id = 7;
     // var name = question;
     let sql10 = 'INSERT INTO player_guesses (name, guess, question) VALUES ($1, $2, $3)';
