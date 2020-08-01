@@ -136,7 +136,9 @@ app.get('/retrieve_question/', async (req, res) => {
     var name2_unbracketed = name2[0];
     var name3_unbracketed = name3[0];
     var name4_unbracketed = name4[0];
-    var name5_unbracketed = name5[0];
+    var name5_unbracketed = name5[0]; //question id
+
+    console.log('question_id', name5_unbracketed);
 
     // var question_mid = JSON.stringify({'id' : question_id});
     // console.log('question_mid', question_mid);
@@ -145,6 +147,7 @@ app.get('/retrieve_question/', async (req, res) => {
 
     var combined_sender = Object.assign(name5_unbracketed, name_unbracketed, name1_unbracketed, name2_unbracketed, name3_unbracketed, name4_unbracketed);
     console.log('combined', combined_sender); 
+    // console.log()
     // console.log('result:', name, name2);
 
     // let params2 = [question_id];
@@ -184,7 +187,7 @@ app.get('/retrieve_question/', async (req, res) => {
 
 
 
-app.put('/retrieve_question/', async (req, res) => {
+app.put('/retrieve_question/', async (req, res) => { //obsolete? 
 // await fakeNetworkDelay();
 
   try {
@@ -229,45 +232,63 @@ app.put('/guess_update/', async (req, res) => {
     const ref_num = req.body.ref_num;
     // console.log('message', question);
     console.log('player guess', name, guess, ref_num);
+    var original_submission = 2;  //declare this variable outside the function so it's defined later & accessible
 
+    // // // async function guess_update() {
+        const dub_submission_check = await pool.connect(); 
+    //    	// let name_nat = 'Natalie';
+        let sql_check = 'SELECT * FROM player_guesses WHERE name = $1 AND question = $2 AND created_at IS NOT NULL ORDER By created_at DESC LIMIT 10';
+        // let sql_check = 'SELECT * FROM player_guesses WHERE name = $1 AND question = $2';
+        let name_nat_param = [ name, ref_num ];   
+        await dub_submission_check.query(sql_check, name_nat_param, function(err, results) {
+  
+        console.log('submission_selection', results.rows[0]);  //returns undefined if no previous answer
+    // // make sure you handle errors from here as well,
+    // // including signaling `res` and `done`
+    //     var previous_entry = results.rows[0];
+
+        //written to see if result was repeated. Question - how do get variable outside of function?
+        try { 
+            var is_repeat2 = results.rows[0];
+            console.log(is_repeat2);
+            var repeat_player_name = is_repeat2['name'];
+            console.log('repeat player name', repeat_player_name);
+            var original_submission = 0;
+        } catch {
+            console.log('nonrepeater');
+            var original_submission = 1;
+        }
+
+
+        });
+
+    // //     // console.log('submission_selection', submission_selection)
+        dub_submission_check.release();
+
+    console.log('submission_selection', results.rows[0]); 
+
+
+    console.log('original_submission value', original_submission);
+        if  (original_submission == 1) {
+        const client = await pool.connect();
+        // var id = 7;
+        // var name = question;
+        let sql10 = 'INSERT INTO player_guesses (name, guess, question) VALUES ($1, $2, $3)';
+        let params = [ name, guess, ref_num ];
+
+        await client.query(sql10, params, function(err) {
+    // make sure you handle errors from here as well,
+    // including signaling `res` and `done`
+        }); 
+
+        client.release(); //changed from 'release' to 'end'
 
     
-    const dub_submission_check = await pool.connect();
 
-
-   	// let name_nat = 'Natalie';
-    let sql_check = 'SELECT * FROM player_guesses WHERE name = $1';
-    let name_nat_param = [ name ];   
-    await dub_submission_check.query(sql_check, name_nat_param, function(err, results) {
-    	
-    	console.log('submission_selection', results.rows[0]);
-// make sure you handle errors from here as well,
-// including signaling `res` and `done`
-    }); 
-
-    // console.log('submission_selection', submission_selection)
-    dub_submission_check.release();
-
-
-    const client = await pool.connect();
-    // var id = 7;
-    // var name = question;
-    let sql10 = 'INSERT INTO player_guesses (name, guess, question) VALUES ($1, $2, $3)';
-    let params = [ name, guess, ref_num ];
-
-    await client.query(sql10, params, function(err) {
-// make sure you handle errors from here as well,
-// including signaling `res` and `done`
-    }); 
-
-    client.release(); //changed from 'release' to 'end'
-
-
-
-    const client2 = await pool.connect();
+    const client22 = await pool.connect();
     let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
 
-    const  temp  = await client.query(sql14, params );
+    const  temp  = await client22.query(sql14, params ); //this was where it went wonky - July 31 2020
 
 
     console.log('temp', temp.rows)
@@ -289,7 +310,7 @@ app.put('/guess_update/', async (req, res) => {
     // console.log("test12", test12);
     // var guess_id = test12[0];
     // var guess_id_formatted = guess_id.id;  
-    client2.release();
+    client22.release();
 
     //use below to update second table if needed
     // const client_insert_current_guess = await pool.connect();
@@ -338,6 +359,10 @@ app.put('/guess_update/', async (req, res) => {
     var current_grade_string = JSON.stringify({grade :current_grade});
     console.log('grade string', current_grade_string);
     res.send( current_grade_string );  // do we actually want to send anything?
+
+    } else {
+        console.log('Player already submitted');
+    }
   } catch (err) {
     console.error(err);
     res.send("Error " + err);
