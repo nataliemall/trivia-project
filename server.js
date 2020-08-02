@@ -1,6 +1,5 @@
 //trivia-crowd
 
-
 const PORT = process.env.PORT || 5000;
 
 const express = require('express');
@@ -20,14 +19,10 @@ let router = require('express').Router();
 let bodyParser = require('body-parser');
 router.use(bodyParser.json());
 
-
 // const PORT = process.env.PORT || 4002;
 
 app.use(express.static('public'));
 
-// app.get('/submitted_question/', (req, res, send) => {
-//     res.send('Your question was submitted')
-//     })
 
 app.get('/db', async (req, res) => {     //creating the database if postgresQL
 try {
@@ -42,12 +37,8 @@ try {
 } 
 })
 
-// app.get('/somewhere_else/', async (req, res) => {
-//   console.log('Here we will place the confirmation page')
-// })
 
 app.put('/table_update/', async (req, res) => {
-// await fakeNetworkDelay();
 
   try {
     const client = await pool.connect();
@@ -64,8 +55,7 @@ app.put('/table_update/', async (req, res) => {
     console.log('message', question);
     console.log('answers', name, answerA, answerB, answerC, answerD, correct_answer);
 
-    // var id = 7;
-    // var name = question;
+
     let sql = 'INSERT INTO trivia_questions (name, question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     let params = [ name, question, answerA, answerB, answerC, answerD, correct_answer ];
 
@@ -84,6 +74,38 @@ app.put('/table_update/', async (req, res) => {
       
     });
 
+
+app.get('/retrieve_list/', async (req, res) => {
+
+    var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 10';
+    const list_client = await pool.connect();
+    const { rows: q_list } = await list_client.query(sql_q_list);
+    list_client.release();   
+
+    console.log('q_list', q_list[0]);
+
+    var q_list_qs = q_list[0].question;
+    console.log(q_list_qs)
+    console.log('length', q_list.length);
+
+    
+    var i;
+    var complete_list = ""
+    for (i = 0; i < 10; i++) {
+        complete_list += q_list[i].question + "<br>";
+    }
+
+    console.log('complete_list', complete_list)
+
+    var question_list = 'question_list_placeholder'
+    var question_obj = Object.assign(complete_list);
+    res.send(question_obj);
+
+});
+
+
+
+
 app.get('/retrieve_question/', async (req, res) => {
 
   try{
@@ -101,6 +123,7 @@ app.get('/retrieve_question/', async (req, res) => {
     var question_id_var = q_unbracketed.id;
     console.log('question_id_var', question_id_var);
 
+
     // var question_id = 8;  //hard-coded way  where the question is chosen 
 
     let sql = 'SELECT (question) FROM  trivia_questions WHERE id = $1';
@@ -108,13 +131,6 @@ app.get('/retrieve_question/', async (req, res) => {
     let sql2 = 'SELECT (answerb) FROM  trivia_questions WHERE id = $1';
     let sql3 = 'SELECT (answerc) FROM  trivia_questions WHERE id = $1';
     let sql4 = 'SELECT (answerd) FROM  trivia_questions WHERE id = $1';
-
-
-
-    // let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
-    // let params11 = [ref_num];
-    // console.log(params11)
-    // const  { rows: test11 } = await client11.query(sql11, params11)
 
 
     let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
@@ -153,55 +169,21 @@ app.get('/retrieve_question/', async (req, res) => {
 
     console.log('question_id', name5_unbracketed);
 
-    // var question_mid = JSON.stringify({'id' : question_id});
-    // console.log('question_mid', question_mid);
-    // var id_unbracketed = JSON.parse(question_mid);
-    // console.log('id_unbracketed', id_unbracketed);
-
     var combined_sender = Object.assign(name5_unbracketed, name_unbracketed, name1_unbracketed, name2_unbracketed, name3_unbracketed, name4_unbracketed);
     console.log('combined', combined_sender); 
-    // console.log()
-    // console.log('result:', name, name2);
 
-    // let params2 = [question_id];
-
-    // client.query(answers, params2).then(res => {
-    // const result_answers = res.rows;
-    // // console.log('result 2:', res)
-    // })
-
-    // .finally(()=> client.end());
-
-    // let router = require('express').Router();
-    // let bodyParser = require('body-parser');
-    // router.use(bodyParser.json());
-    // console.log('res send thing', result_answers)
     res.send(combined_sender);
     
   } catch (err) {
         console.error(err);
         res.send("Error " + err);
       } 
-// client.query('SELECT 1 + 4').then(res => {
 
-//     const result = R.head(R.values(R.head(res.rows)));
-
-//     console.log(result);
-// }).finally(() => client.end());
-
-
-
-  // console.log('current question:', current_question)
-  // res.send('question sent')
-
-  // console.log('querry retrieval:', sql)
   console.log('test retrieve question')
 })
 
 
-
 app.put('/retrieve_question/', async (req, res) => { //obsolete? 
-// await fakeNetworkDelay();
 
   try {
     const client = await pool.connect();
@@ -210,18 +192,6 @@ app.put('/retrieve_question/', async (req, res) => { //obsolete?
     const message = req.body.mykey; //"${message}"
     console.log('message', message);
 
-//     // client.query(`INSERT INTO test_table(name) VALUES ( "${message}")`);
-//     // ^^commented out until the display can display all messages
-
-//     var id = 7;
-//     var name = message;
-//     let sql = 'INSERT INTO test_table (id, name) VALUES ($1, $2)';
-//     let params = [ id, name ];
-//     client.query(sql, params, function(err) {
-// // make sure you handle errors from here as well,
-// // including signaling `res` and `done`
-// }); 
-
     res.send( "sent" );  // do we actually want to send anything?
     client.release(); //changed from 'release' to 'end'
   } catch (err) {
@@ -229,7 +199,6 @@ app.put('/retrieve_question/', async (req, res) => { //obsolete?
     res.send("Error " + err);
   } 
 
-      
     });
 
 
@@ -263,16 +232,31 @@ app.put('/guess_update/', async (req, res) => {
 
     console.log('temp_ids_after_release', temp23_ids);
 
+    function myExecutor(resolve, reject){
+        if (temp23_ids) {
+          resolve('Player has already submitted');
+        }
+        else {
+          reject('This is the first submission');
+        }
+        }
+
+    function check_submission(){
+      
+      const myFirstPromise = new Promise(myExecutor);
+      return myFirstPromise
+    }
+
+    var orderPromise = check_submission()
+
+    console.log('orderPromise', orderPromise)
     // console.log('guess_idTEST', guess_id_formatted23 )
 
 
         original_submission = 2
         console.log('refresh test');
         if (temp23_ids) { //if this is an emply array, it means there hasn't been a previous answer submission
-            // var is_repeat2 = results.rows[0];
-            // console.log('isrepeat2', is_repeat2);
-            // var repeat_player_name = is_repeat2['name'];
-            // console.log('repeat player name', repeat_player_name);
+
             var original_submission = 0;
             console.log('repeat player');
 
@@ -280,9 +264,6 @@ app.put('/guess_update/', async (req, res) => {
             console.log('nonrepeater');
             var original_submission = 1;
         }
-
-    // //     // console.log('submission_selection', submission_selection)
-        // dub_submission_check.release();  //originally released here
 
     try {
 
@@ -301,9 +282,6 @@ app.put('/guess_update/', async (req, res) => {
 
         client.release(); //changed from 'release' to 'end'
 
-    
-    // dub_submission_check.release();
-
 
     const client22 = await pool.connect();
     let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
@@ -316,37 +294,12 @@ app.put('/guess_update/', async (req, res) => {
     var temp_ids = temp.rows[0];
     console.log('temp_ids', temp_ids)
     var guess_id_formatted = temp_ids.id;
-
-
-    // console.log('id_val', guess_id_formatted);
-
-    // const {id: test12} = temp.rows;
-
-//     const  {id: test12}  = await client.query(sql14, params, function(err) {
-// // make sure you handle errors from here as well,
-// // including signaling `res` and `done`
-//     });  
-
-    // console.log("test12", test12);
-    // var guess_id = test12[0];
-    // var guess_id_formatted = guess_id.id;  
+ 
     client22.release();
-
-    //use below to update second table if needed
-    // const client_insert_current_guess = await pool.connect();
-
-    // let sql_current = 'INSERT INTO recent_guesses (name, guess, question) VALUES ($1, $2, $3)';
-    // const temp2 = await client_insert_current_guess.query() ...
-
-    // client_insert_current_guess,release();
-
 
 
     console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
     //send guess_id along to the front end - then use this to extract the correct eval
-
-
-
 
     const client11 = await pool.connect();
     let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
@@ -416,15 +369,8 @@ app.get('/score/', async (req, res) => {
 })
 
 
-// app.get('/thanks/', async (req, res) => {
-//   console.log('thank you for your submission')
-// })
-
-
 //port listening, which happens once at the end of the code 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
-
-
 
