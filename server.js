@@ -88,7 +88,20 @@ app.get('/retrieve_question/', async (req, res) => {
 
   try{
 
-    var question_id = 8;  //here's where the question is chosen 
+    //reaches into current_question table to retrieve current question
+    var q_title = 'Test';
+    let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
+    let q_params = [q_title];
+    const q_client = await pool.connect();
+    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+    q_client.release();    
+    var q_unbracketed = q_name[0];
+    console.log('q_unbracketed', q_unbracketed);
+
+    var question_id_var = q_unbracketed.id;
+    console.log('question_id_var', question_id_var);
+
+    // var question_id = 8;  //hard-coded way  where the question is chosen 
 
     let sql = 'SELECT (question) FROM  trivia_questions WHERE id = $1';
     let sql1 = 'SELECT (answera) FROM  trivia_questions WHERE id = $1';
@@ -105,7 +118,7 @@ app.get('/retrieve_question/', async (req, res) => {
 
 
     let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
-    let params = [question_id];
+    let params = [question_id_var];
 
     const client = await pool.connect();
     const { rows: name } = await client.query(sql, params)
@@ -223,7 +236,7 @@ app.put('/retrieve_question/', async (req, res) => { //obsolete?
 app.put('/guess_update/', async (req, res) => {
 // await fakeNetworkDelay();
 
-  try {
+  // try {
 
     //select the current 
     const name = req.body.name;
@@ -234,39 +247,44 @@ app.put('/guess_update/', async (req, res) => {
     console.log('player guess', name, guess, ref_num);
     var original_submission = 2;  //declare this variable outside the function so it's defined later & accessible
 
-    // // // async function guess_update() {
-        const dub_submission_check = await pool.connect(); 
-    //    	// let name_nat = 'Natalie';
-        let sql_check = 'SELECT * FROM player_guesses WHERE name = $1 AND question = $2 AND created_at IS NOT NULL ORDER By created_at DESC LIMIT 10';
-        // let sql_check = 'SELECT * FROM player_guesses WHERE name = $1 AND question = $2';
-        let name_nat_param = [ name, ref_num ];   
-        await dub_submission_check.query(sql_check, name_nat_param, function(err, results) {
-  
-        console.log('submission_selection', results.rows[0]);  //returns undefined if no previous answer
-    // // make sure you handle errors from here as well,
-    // // including signaling `res` and `done`
-    //     var previous_entry = results.rows[0];
 
-        //written to see if result was repeated. Question - how do get variable outside of function?
-        try { 
-            var is_repeat2 = results.rows[0];
-            console.log(is_repeat2);
-            var repeat_player_name = is_repeat2['name'];
-            console.log('repeat player name', repeat_player_name);
+    const client23 = await pool.connect();
+    let sql23 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND question = $2';
+    let params23 = [ name, ref_num ]
+    const  temp23  = await client23.query(sql23, params23 ); 
+    console.log('temp23', temp23.rows)
+    //add error catch here for if more than one ID comes up (i.e. answered twice)
+    
+    var temp23_ids = temp23.rows[0];
+    console.log('temp23_ids', temp23_ids);
+    // var guess_id_formatted23 = temp23_ids.id;
+
+    client23.release();
+
+    console.log('temp_ids_after_release', temp23_ids);
+
+    // console.log('guess_idTEST', guess_id_formatted23 )
+
+
+        original_submission = 2
+        console.log('refresh test');
+        if (temp23_ids) { //if this is an emply array, it means there hasn't been a previous answer submission
+            // var is_repeat2 = results.rows[0];
+            // console.log('isrepeat2', is_repeat2);
+            // var repeat_player_name = is_repeat2['name'];
+            // console.log('repeat player name', repeat_player_name);
             var original_submission = 0;
-        } catch {
+            console.log('repeat player');
+
+         } else {
             console.log('nonrepeater');
             var original_submission = 1;
         }
 
-
-        });
-
     // //     // console.log('submission_selection', submission_selection)
-        dub_submission_check.release();
+        // dub_submission_check.release();  //originally released here
 
-    console.log('submission_selection', results.rows[0]); 
-
+    try {
 
     console.log('original_submission value', original_submission);
         if  (original_submission == 1) {
@@ -284,6 +302,8 @@ app.put('/guess_update/', async (req, res) => {
         client.release(); //changed from 'release' to 'end'
 
     
+    // dub_submission_check.release();
+
 
     const client22 = await pool.connect();
     let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
@@ -337,7 +357,7 @@ app.put('/guess_update/', async (req, res) => {
     console.log('test11', test11[0]);
     var answer_key = test11[0];
     var correct_answer = answer_key.correctanswer
-    client.release(); //changed from 'release' to 'end'
+    // client.release(); //changed from 'release' to 'end'  //this was a type release statement 
 
     if (correct_answer == guess) {
       console.log('answer was correct! direct to results page')
@@ -368,6 +388,7 @@ app.put('/guess_update/', async (req, res) => {
     res.send("Error " + err);
   } 
 
+  client11.release();
       
     });
 

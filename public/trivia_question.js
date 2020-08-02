@@ -6,6 +6,7 @@ const ref_num = document.getElementById('question_ref_num');
 const buttona = document.getElementById('optiona');
 const submit_button = document.getElementById('submit_button');
 
+var passed_id = '9';
 
 function refreshDisplay() {
   fetch('/retrieve_question/') // gets /api/messages (GET is the default)
