@@ -62,11 +62,11 @@ function displayMessage(message1) {
 
 
 
-  var r = document.getElementsByTagName("label");  
-  r[1].innerHTML = message1['answera'];
-  r[2].innerHTML = message1['answerb'];
-  r[3].innerHTML = message1['answerc'];
-  r[4].innerHTML = message1['answerd'];
+  // var r = document.getElementsByTagName("label");  
+  // r[1].innerHTML = message1['answera'];
+  // r[2].innerHTML = message1['answerb'];
+  // r[3].innerHTML = message1['answerc'];
+  // r[4].innerHTML = message1['answerd'];
 
 }
 
@@ -90,6 +90,8 @@ submit_button.addEventListener('click', () => {
     const bobcatStr = JSON.stringify(mykey2);
     console.log(bobcatStr);
 
+    var response_text = "";
+    const submission_response = document.getElementById('submission_response');
 
     fetch('/current_q_update/', {
       method: 'PUT',
@@ -103,12 +105,14 @@ submit_button.addEventListener('click', () => {
 
       // 'Content-Type': 'application/x-www-form-urlencoded',
       } 
-      }).then(() => {
-      // TODO something
-      // refreshDisplay();  //add back in when ready to fetch a webpage saying "submission completed"
-      console.log('test FETCH');
-      // refreshDisplay();
-    });
+      }).then((result) => result.json()
+      ).then((variable) => {
+        console.log('returned val', variable)
+        var response_text = JSON.stringify(variable.incorrect);
+        submission_response.innerHTML = response_text;
+      });
+
+
 
 
     console.log('TEST');

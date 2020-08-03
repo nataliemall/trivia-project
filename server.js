@@ -50,9 +50,9 @@ app.put('/current_q_update/', async (req, res) => {
 
     // console.log('name', question);
     console.log('player question', name, question_id);
-    var original_submission = 2;  //declare this variable outside the function so it's defined later & accessible
 
 
+    if (name === 'Natalie') {
     const client24 = await pool.connect();
     let sql24 = 'UPDATE current_question SET id = $1';
     let params24 = [ question_id  ]
@@ -65,6 +65,15 @@ app.put('/current_q_update/', async (req, res) => {
     // var guess_id_formatted23 = temp23_ids.id;
 
     client24.release();
+    } else {
+        console.log('incorrect username');
+        var response = ('incorrect username');
+        // var response2 = JSON.object(response);
+        // var incorrect = JSON.stringify(response2);
+        var response2 = JSON.stringify({incorrect :"wrong username"});
+        console.log('response2', response2);
+        res.send(response2);
+    }
 
 });
 
@@ -107,7 +116,7 @@ app.put('/table_update/', async (req, res) => {
 
 app.get('/retrieve_list/', async (req, res) => {
 
-    var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 10';
+    var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 20';
     // var id_list = 'SELECT '
     const list_client = await pool.connect();
     const { rows: q_list } = await list_client.query(sql_q_list);
