@@ -37,6 +37,36 @@ try {
 } 
 })
 
+app.put('/current_q_update/', async (req, res) => {
+// await fakeNetworkDelay();
+
+  // try {
+
+    //select the current 
+    const name = req.body.name;
+    // const player_answer = req.body.player_answer; //"${message}"
+    const question_id = req.body.question_id;
+    // const ref_num = req.body.ref_num;
+
+    // console.log('name', question);
+    console.log('player question', name, question_id);
+    var original_submission = 2;  //declare this variable outside the function so it's defined later & accessible
+
+
+    const client24 = await pool.connect();
+    let sql24 = 'UPDATE current_question SET id = $1';
+    let params24 = [ question_id  ]
+    const  temp23  = await client24.query(sql24, params24 ); 
+    console.log('temp24', temp24.rows)
+    //add error catch here for if more than one ID comes up (i.e. answered twice)
+    
+    var temp24_ids = temp24.rows[0];
+    console.log('temp24_ids', temp24_ids);
+    // var guess_id_formatted23 = temp23_ids.id;
+
+    client24.release();
+
+});
 
 app.put('/table_update/', async (req, res) => {
 
@@ -78,8 +108,11 @@ app.put('/table_update/', async (req, res) => {
 app.get('/retrieve_list/', async (req, res) => {
 
     var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 10';
+    // var id_list = 'SELECT '
     const list_client = await pool.connect();
     const { rows: q_list } = await list_client.query(sql_q_list);
+
+
     list_client.release();   
 
     console.log('q_list', q_list[0]);
@@ -90,16 +123,32 @@ app.get('/retrieve_list/', async (req, res) => {
 
     
     var i;
-    var complete_list = ""
-    for (i = 0; i < 10; i++) {
-        complete_list += q_list[i].question + "<br>";
+    var complete_list = [];
+    var id_list = [];
+    for (i = 0; i < q_list.length; i++) {
+        complete_list[i] = q_list[i].question;
+        id_list[i] = q_list[i].id;
     }
 
-    console.log('complete_list', complete_list)
+    // creates key:value pairs
+    var n;
+    var q_object = {};
+    for (n = 0; n < q_list.length; n++) {
+        q_object[(id_list[n])] = complete_list[n];
+    }
+
+    var test2 = JSON.stringify(q_object);
+
+    console.log('test2', test2)
+
+    console.log('object_list', q_object)
+
+
+    console.log('complete_list', complete_list, id_list)
 
     var question_list = 'question_list_placeholder'
-    var question_obj = Object.assign(complete_list);
-    res.send(question_obj);
+    var question_obj = Object.assign(test2);
+    res.send(q_object);
 
 });
 
