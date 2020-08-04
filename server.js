@@ -13,6 +13,10 @@ const pool = new Pool({
   }
 });
 
+//settings - adjust for player entry periods: 
+var question_answer_mode = 1; 
+var reveal_mode = 0; 
+
 app.use(express.json()) // for parsing application/json
 
 let router = require('express').Router();
@@ -38,7 +42,7 @@ try {
 })
 
 app.put('/current_q_update/', async (req, res) => {
-// await fakeNetworkDelay();
+// for admin to update the current question available to players
 
   // try {
 
@@ -109,6 +113,7 @@ app.put('/table_update/', async (req, res) => {
     console.error(err);
     res.send("Error " + err);
   } 
+  
 
       
     });
@@ -424,6 +429,10 @@ app.get('/score/', async (req, res) => {
     console.error(err);
     res.send("Error " + err);
   } 
+})
+
+app.get('/closed_submission/', async (req, res) =>{
+    
 })
 
 

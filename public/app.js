@@ -1,10 +1,19 @@
 //triva-crowds
+var question_submission_mode = 0; 
 
 console.log('hello from the client side')
 
 const q1 = document.getElementById('q1');
 const submit_button = document.getElementById('submit_button');
 
+
+if (question_submission_mode === 0) {
+  const closed = document.getElementById('closed');
+  closed.innerHTML = 'sorry, question submissions are now closed. Write down you ideas and save them for later!';
+
+}
+
+if (question_submission_mode === 1) {
 
 submit_button.addEventListener('click', () => {
     console.log('TEST2')
@@ -53,14 +62,14 @@ submit_button.addEventListener('click', () => {
       // refreshDisplay();  //add back in when ready to fetch a webpage saying "submission completed"
       console.log('test FETCH');
       // refreshDisplay();
-    });
-
-    fetch('/thanks/', {
-      method: 'GET'
-      // console.log('thank you on the client side here')
-    });
+    })
 
     console.log('TEST');
 })
 
+} else {
+        console.log('Error: closed for submission');
+        const still_closed = document.getElementById('still_closed');
+        still_closed.innerHTML = 'This button will not actually work-  save your question for the next round!';
+      }
 
