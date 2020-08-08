@@ -113,8 +113,6 @@ app.put('/table_update/', async (req, res) => {
     console.error(err);
     res.send("Error " + err);
   } 
-  
-
       
     });
 
@@ -167,10 +165,9 @@ app.get('/retrieve_list/', async (req, res) => {
 });
 
 
-
-
 app.get('/retrieve_question/', async (req, res) => {
 
+    console.log('start*****');
   try{
 
     //reaches into current_question table to retrieve current question
@@ -201,6 +198,8 @@ app.get('/retrieve_question/', async (req, res) => {
 
     const client = await pool.connect();
     const { rows: name } = await client.query(sql, params)
+    // const temp123 = await client.query(sql, params)
+    // const name = temp123.rows;
     client.release();
 
     const client1 = await pool.connect();
@@ -234,7 +233,7 @@ app.get('/retrieve_question/', async (req, res) => {
 
     var combined_sender = Object.assign(name5_unbracketed, name_unbracketed, name1_unbracketed, name2_unbracketed, name3_unbracketed, name4_unbracketed);
     console.log('combined', combined_sender); 
-
+    console.log('******')
     res.send(combined_sender);
     
   } catch (err) {
@@ -379,9 +378,9 @@ app.put('/guess_update/', async (req, res) => {
       console.log('answer was correct! direct to results page')
       const client12 = await pool.connect();
       // let sql12 = 'UPDATE (points) FROM player_guesses WHERE id = $1'
-      let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1';
-      // let params11 = [ref_num];
-      client12.query(sql12, params11);
+      let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1 AND name = $2';
+      let params12 = [ref_num, name];
+      client12.query(sql12, params12);
 
 
       console.log(params11);
@@ -399,31 +398,37 @@ app.put('/guess_update/', async (req, res) => {
     } else {
         console.log('Player already submitted');
     }
+  client11.release();
   } catch (err) {
     console.error(err);
     res.send("Error " + err);
   } 
 
-  client11.release();
       
     });
 
-app.get('/score/', async (req, res) => {
+
+app.get('/player_scores/', async (req, res) => {  //this should hopefully be obsolete?
+  
   try {
+
+
     const client13 = await pool.connect();
     let sql13 = 'SELECT * FROM player_guesses WHERE question = $1'; //needs to update according to question
-    params = ['8']
+    params = ['53']; //hard-coded for now - fix this
     const { rows: name13 } = await client13.query(sql13, params);
 
     
-    console.log('most recent guess', name13[0]);  //shouldn't the query have all the player_guesses?
-    // console.log('player guesses', name13);
+    // console.log('most recent guess', name13[0]);  //shouldn't the query have all the player_guesses?
+    console.log('player guesses', name13);
 
     client13.release();
     var player_name = name13[0];
 
     // player_name_json = JSON.stringify({name: player_name});
     player_name_json = JSON.stringify(name13);
+
+    console.log('player_name_json', player_name_json)
     res.send(player_name_json);
   } catch (err) {
     console.error(err);
@@ -431,9 +436,16 @@ app.get('/score/', async (req, res) => {
   } 
 })
 
-app.get('/closed_submission/', async (req, res) =>{
-    
+app.put('/reveal_score/', async (req, res) => {
+
+    console.log('reveal score code goes here');
 })
+
+app.get('/closed_submission/', async (req, res) =>{
+
+})
+
+
 
 
 //port listening, which happens once at the end of the code 

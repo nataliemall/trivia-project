@@ -23,21 +23,21 @@ console.log(player_name, player_guess, current_question);
 
 
 
-function refreshDisplay() {
-  fetch('/score/') // gets /api/messages (GET is the default)
-    .then(result => result.json() // console.log(result) 
-      ).then(data => displayMessage(data) //console.log(data)
-      ).catch(error => console.log('There was an error', error));
-}
+// function refreshDisplay() {
+//   fetch('/score/') // gets /api/messages (GET is the default)
+//     .then(result => result.json() // console.log(result) 
+//       ).then(data => displayMessage(data) //console.log(data)
+//       ).catch(error => console.log('There was an error', error));
+// }
 
 
 
-function displayMessage(message1) {   
+function displayMessage() {   
 
 //hacky way don't judge me
-  console.log('results message', message1); //this currently returns entire database for Question #8
+  // console.log('results message', message1); //this currently returns entire database for Question #8
   // console.log('updated', message1.points);
-  console.log('updated name', message1.name);
+  // console.log('updated name', message1.name);
   // Pandu halp.  - us ID doh
   // console.log(message1.name.points)
 
@@ -58,15 +58,15 @@ function displayMessage(message1) {
   // console.log('results message', message1);
   // console.log(message1.name.points)
 
-  if (message1.name == 1) {
-    console.log('player is correct');
-    document.getElementById("myImg").src = "happykitty.gif";
-  } else if (message1 == 0) {
-    console.log('player is incorrect');
-    document.getElementById("myImg").src ="Pouty Yellow Cat GIF.gif"
-  } 
+  // if (message1.name == 1) {
+  //   console.log('player is correct');
+  //   document.getElementById("myImg").src = "happykitty.gif";
+  // } else if (message1 == 0) {
+  //   console.log('player is incorrect');
+  //   document.getElementById("myImg").src ="Pouty Yellow Cat GIF.gif"
+  // } 
 
 
 }
 
-refreshDisplay()
+displayMessage()

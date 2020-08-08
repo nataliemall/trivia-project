@@ -112,10 +112,54 @@ submit_button.addEventListener('click', () => {
         submission_response.innerHTML = response_text;
       });
 
-
-
-
     console.log('TEST');
+})
+
+score_button.addEventListener('click', () => {
+
+  // fetch('/player_scores/')
+
+  function refreshDisplay() {
+  // fetch('/reveal_score/') // gets /api/messages (GET is the default)
+  //   .then(result => result.json() // console.log(result) 
+  //     ).then(data => displayMessage(data) //console.log(data)
+  //     ).catch(error => console.log('There was an error', error));
+
+    fetch('/reveal_score/', {
+          method: 'PUT',
+          body: bobcatStr,
+          headers: {
+          'Content-Type': 'application/json'
+          } 
+          }
+          ).then(result => result.json())
+            .then(data => wasitcorrect(data))
+            .then(console.log('wasitcorrect has passed'))
+            .then( (player_eval) => {
+              window.location.href = 
+              "/results.html?Page=data&name=" + nameParam + "&question=" 
+              + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval; }) //is there a way to get the res.send file from this? 
+
+  }
+
+  var name = 'test_name'
+  const mykey2 = { "name" : name }     
+  console.log("mykey2", mykey2)
+
+  const bobcatStr = JSON.stringify(mykey2);
+  console.log(bobcatStr);      
+
+  function displayMessage(message1) {   
+
+  //hacky way don't judge me
+    console.log('results message', message1); 
+    }
+
+  refreshDisplay()
+
+
+
+
 })
 
 
