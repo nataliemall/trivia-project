@@ -186,55 +186,31 @@ app.get('/retrieve_question/', async (req, res) => {
 
     // var question_id = 8;  //hard-coded way  where the question is chosen 
 
-    let sql = 'SELECT (question) FROM  trivia_questions WHERE id = $1';
-    let sql1 = 'SELECT (answera) FROM  trivia_questions WHERE id = $1';
-    let sql2 = 'SELECT (answerb) FROM  trivia_questions WHERE id = $1';
-    let sql3 = 'SELECT (answerc) FROM  trivia_questions WHERE id = $1';
-    let sql4 = 'SELECT (answerd) FROM  trivia_questions WHERE id = $1';
+    let sql = 'SELECT id, question, answera, answerb, answerc, answerd FROM  trivia_questions WHERE id = $1';
 
-
-    let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
+    // let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
     let params = [question_id_var];
 
     const client = await pool.connect();
-    const { rows: name } = await client.query(sql, params)
+    const result = await client.query(sql, params);
     // const temp123 = await client.query(sql, params)
     // const name = temp123.rows;
+    console.log('result', result)
+    // return 
     client.release();
 
-    const client1 = await pool.connect();
-    const { rows: name1 } = await client1.query(sql1, params)
-    client1.release();
+    var name5_unbracketed = result.rows[0].id; //question id
+    var temp25 = JSON.stringify({id: name5_unbracketed})
 
-    const client2 = await pool.connect();
-    const { rows: name2 } = await client2.query(sql2, params)
-    client2.release();
+    console.log('temp25', temp25);
+    // return
+    // var combined_sender = Object.assign(temp25);
+    var combined_sender = JSON.stringify({id: result.rows[0].id});
 
-    const client3 = await pool.connect();
-    const { rows: name3 } = await client3.query(sql3, params)
-    client3.release();
-
-    const client4 = await pool.connect();
-    const { rows: name4 } = await client4.query(sql4, params)
-    client4.release();
-
-    const client5 = await pool.connect();
-    const { rows: name5 } = await client5.query(sql5, params)
-    client5.release();    
-
-    var name_unbracketed = name[0];
-    var name1_unbracketed = name1[0];
-    var name2_unbracketed = name2[0];
-    var name3_unbracketed = name3[0];
-    var name4_unbracketed = name4[0];
-    var name5_unbracketed = name5[0]; //question id
-
-    console.log('question_id', name5_unbracketed);
-
-    var combined_sender = Object.assign(name5_unbracketed, name_unbracketed, name1_unbracketed, name2_unbracketed, name3_unbracketed, name4_unbracketed);
-    console.log('combined', combined_sender); 
+    var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd })
+    console.log('combined', combined_sender2); 
     console.log('******')
-    res.send(combined_sender);
+    res.send(combined_sender2);
     
   } catch (err) {
         console.error(err);
@@ -412,10 +388,26 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
   
   try {
 
+    var q_title = 'Test';
+    let sql_q_id = 'SELECT (revealed_question) FROM current_question WHERE question_written = $1';
+    let q_params = [q_title];
+    const q_client = await pool.connect();
+    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+    q_client.release();    
+    var q_unbracketed = q_name[0];
+    console.log('q_unbracketed', q_unbracketed);
+
+    var revealed_id_var = q_unbracketed.revealed_question;
+    console.log('revealed_id_var', revealed_id_var);
+
+
+
+
 
     const client13 = await pool.connect();
     let sql13 = 'SELECT * FROM player_guesses WHERE question = $1'; //needs to update according to question
-    params = ['53']; //hard-coded for now - fix this
+    // params = ['53']; //hard-coded for now - fix this
+    let params = [ revealed_id_var ]
     const { rows: name13 } = await client13.query(sql13, params);
 
     
@@ -436,7 +428,27 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
   } 
 })
 
-app.put('/reveal_score/', async (req, res) => {
+app.put('/reveal_score/', async (req, res) => {  
+    // updates revealed_question column of current_question data table 
+    // to reveal score of new question
+
+    const name = req.body.name;
+    console.log('player question', name);
+
+    if (name === 'Natalie') {
+    const client25 = await pool.connect();
+
+    let sql26 = 'SELECT id FROM current_question'
+    const  {rows: temp26}  = await client25.query(sql26); 
+
+    // var question_to_reveal = 47  // temporarily hardcoded 
+    var question_to_reveal = temp26[0].id 
+    let sql25 = 'UPDATE current_question SET revealed_question = $1';
+    let params25 = [ question_to_reveal  ]
+    const  temp25  = await client25.query(sql25, params25 ); 
+
+    client25.release();
+    }
 
     console.log('reveal score code goes here');
 })

@@ -142,7 +142,8 @@ score_button.addEventListener('click', () => {
 
   }
 
-  var name = 'test_name'
+  const name = document.getElementById('name').value;
+  // var name = 'test_name'
   const mykey2 = { "name" : name }     
   console.log("mykey2", mykey2)
 

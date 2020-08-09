@@ -3,6 +3,18 @@ console.log('hello from the score_page')
 const displayElement = document.getElementById('current_question');
 
 
+function refreshDisplay() {  //displays the current question
+  fetch('/retrieve_question/') // gets /api/messages (GET is the default)
+    .then(result => result.json() // console.log(result) 
+      )
+    // .then(console.log(result))
+    .then(data => displayMessage(data)
+      )
+    .catch(error => console.log('There was an error', error));
+}
+
+
+
 // function myFunction() {
 //   var table = document.getElementById("scoreTable");
 //   var row = table.insertRow(0);
