@@ -32,17 +32,6 @@ function wasitcorrect(data){
 
 function displayMessage(message1) {   
 
-  // var test5 = JSON.stringify(recent_quotes); // stringify = recipricol (parse)
-  // var test7 = JSON.parse(test5);
-  // console.log(message_parsed)
-
-  // var current_question = message_parsed['row'];
-  // console.log('test11', test11);
-
-  // console.log(message1);
-  // console.log(message1['id']);
-  // var question_id = message1['id'];
-  // console.log(question_id);
 
   displayElement.innerHTML = message1['question'];   // clear old stuff in displayElement:
   ref_num.innerHTML = message1['id'];

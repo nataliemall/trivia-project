@@ -1,31 +1,11 @@
 console.log('hello from the score_page')
 
-const displayElement = document.getElementById('current_question');
-
-
-function refreshDisplay() {  //displays the current question
-  fetch('/retrieve_question/') // gets /api/messages (GET is the default)
-    .then(result => result.json() // console.log(result) 
-      )
-    // .then(console.log(result))
-    .then(data => displayMessage(data)
-      )
-    .catch(error => console.log('There was an error', error));
-}
+const displayElement = document.getElementById('past_question');
+const answers = document.getElementById('past_answers');
 
 
 
-// function myFunction() {
-//   var table = document.getElementById("scoreTable");
-//   var row = table.insertRow(0);
-//   var cell1 = row.insertCell(0);
-//   var cell2 = row.insertCell(1);
-//   cell1.innerHTML = "NEW CELL1";
-//   cell2.innerHTML = "NEW CELL2";
-// }
-
-
-function displayMessage(message1) {   
+function displayQuestion(message1) {   
 
 
   console.log('message1', message1);
@@ -34,16 +14,68 @@ function displayMessage(message1) {
 
 
   var lengthm = message1.length;
+  // var table = document.getElementById("past_question");
+  
+  displayElement.innerHTML = message1.question;
+  
+  var info = Object.keys(message1).length;
+  
+  // var i;
+  //   for (i = 0; i < info; i++) {
+  //   // text += cars[i] + "<br>";
+  //   variable_name = test7[i];
+  //   console.log(variable_name);
+
+  answers.innerHTML = ( message1.answera + '<br>' );
+  answers.innerHTML += ( message1.answerb + '<br>' );
+  answers.innerHTML += ( message1.answerc + '<br>' );
+  answers.innerHTML += ( message1.answerd + '<br>' );
+
+  // }
+
+//   for (var key in message1) {
+//     //var data = '<option value="' + escapeHTML(i) +'">" + escapeHTML(i) + "</option>';
+//     // option.text = message1[key];
+//     // option.value = key;
+//     // options.push(option.outerHTML);
+
+//     answers.innerHTML += ( message1[key].name + '<br>' )
+// }
+
+  }
+
+
+
+function refreshDisplay() {
+  fetch('/retrieve_revealed_question/') // gets /api/messages (GET is the default)
+    .then(result => result.json() // console.log(result) 
+      )
+    // .then(console.log(result))
+    .then(data => displayQuestion(data)
+      )
+    .catch(error => console.log('There was an error', error));
+}
+
+
+function displayMessage(scores) {   
+
+
+  console.log('scores', scores);
+
+  console.log(scores[1])
+
+
+  var lengthm = scores.length;
   var table = document.getElementById("scoreTable");
   var i;
-  for (i = 0; i < message1.length; i++) {
+  for (i = 0; i < scores.length; i++) {
     // text += cars[i] + "<br>";
     var row = table.insertRow(i+1);
     var cell1 = row.insertCell(0)
-    cell1.innerHTML = message1[i].name;
+    cell1.innerHTML = scores[i].name;
 
     var cell2 = row.insertCell(1)
-    cell2.innerHTML = message1[i].guess;
+    cell2.innerHTML = scores[i].guess;
 
 
   }
@@ -89,6 +121,7 @@ function display_results() {
 };
 
 
+refreshDisplay();
 display_results();
 
 

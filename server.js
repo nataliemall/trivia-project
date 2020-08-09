@@ -167,7 +167,6 @@ app.get('/retrieve_list/', async (req, res) => {
 
 app.get('/retrieve_question/', async (req, res) => {
 
-    console.log('start*****');
   try{
 
     //reaches into current_question table to retrieve current question
@@ -209,7 +208,6 @@ app.get('/retrieve_question/', async (req, res) => {
 
     var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd })
     console.log('combined', combined_sender2); 
-    console.log('******')
     res.send(combined_sender2);
     
   } catch (err) {
@@ -221,23 +219,23 @@ app.get('/retrieve_question/', async (req, res) => {
 })
 
 
-app.put('/retrieve_question/', async (req, res) => { //obsolete? 
+// app.put('/retrieve_question/', async (req, res) => { //obsolete? 
 
-  try {
-    const client = await pool.connect();
+//   try {
+//     const client = await pool.connect();
 
-    //select the current 
-    const message = req.body.mykey; //"${message}"
-    console.log('message', message);
+//     //select the current 
+//     const message = req.body.mykey; //"${message}"
+//     console.log('message', message);
 
-    res.send( "sent" );  // do we actually want to send anything?
-    client.release(); //changed from 'release' to 'end'
-  } catch (err) {
-    console.error(err);
-    res.send("Error " + err);
-  } 
+//     res.send( "sent" );  // do we actually want to send anything?
+//     client.release(); //changed from 'release' to 'end'
+//   } catch (err) {
+//     console.error(err);
+//     res.send("Error " + err);
+//   } 
 
-    });
+//     });
 
 
 app.put('/guess_update/', async (req, res) => {
@@ -409,18 +407,24 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
     // params = ['53']; //hard-coded for now - fix this
     let params = [ revealed_id_var ]
     const { rows: name13 } = await client13.query(sql13, params);
-
-    
     // console.log('most recent guess', name13[0]);  //shouldn't the query have all the player_guesses?
     console.log('player guesses', name13);
 
     client13.release();
     var player_name = name13[0];
-
     // player_name_json = JSON.stringify({name: player_name});
     player_name_json = JSON.stringify(name13);
-
     console.log('player_name_json', player_name_json)
+
+
+    let sql27 = 'SELECT * FROM trivia_questions WHERE id = $1';
+    const {rows: name27} = await client13.query(sql27, params);
+    var revealed_question = name27[0];
+    console.log('current question name27:', name27);
+
+
+
+
     res.send(player_name_json);
   } catch (err) {
     console.error(err);
@@ -453,11 +457,78 @@ app.put('/reveal_score/', async (req, res) => {
     console.log('reveal score code goes here');
 })
 
-app.get('/closed_submission/', async (req, res) =>{
 
+app.get('/closed_submission/', async (req, res) =>{
 })
 
 
+app.get('/retrieve_revealed_question/', async (req, res) => {
+// displays revieled question on score_page
+
+  try{
+
+    //reaches into current_question table to retrieve revealed_question
+    var q_title = 'Test';
+    let sql_q_id = 'SELECT (revealed_question) FROM current_question WHERE question_written = $1';
+    let q_params = [q_title];
+    const q_client = await pool.connect();
+    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+    q_client.release();    
+    var q_unbracketed = q_name[0];
+    console.log('q_unbracketed', q_unbracketed);
+
+    var revealed_id_var = q_unbracketed.revealed_question;
+    console.log('revealed_id_var', revealed_id_var);
+
+
+    //reaches into current_question table to retrieve current question
+    // var q_title = 'Test';
+    // let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
+    // let q_params = [q_title];
+    // const q_client = await pool.connect();
+    // const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+    // q_client.release();    
+    // var q_unbracketed = q_name[0];
+    // console.log('q_unbracketed', q_unbracketed);
+
+    // var question_id_var = q_unbracketed.id;
+    // console.log('question_id_var', question_id_var);
+
+
+    // var question_id = 8;  //hard-coded way  where the question is chosen 
+
+    let sql = 'SELECT id, question, answera, answerb, answerc, answerd FROM  trivia_questions WHERE id = $1';
+
+    // let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
+    let params = [revealed_id_var];
+
+    const client = await pool.connect();
+    const result = await client.query(sql, params);
+    // const temp123 = await client.query(sql, params)
+    // const name = temp123.rows;
+    console.log('result', result)
+    // return 
+    client.release();
+
+    var name5_unbracketed = result.rows[0].id; //question id
+    var temp25 = JSON.stringify({id: name5_unbracketed})
+
+    console.log('temp25', temp25);
+    // return
+    // var combined_sender = Object.assign(temp25);
+    var combined_sender = JSON.stringify({id: result.rows[0].id});
+
+    var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd })
+    console.log('combined', combined_sender2); 
+    res.send(combined_sender2);
+    
+  } catch (err) {
+        console.error(err);
+        res.send("Error " + err);
+      } 
+
+  console.log('test retrieve question')
+})
 
 
 //port listening, which happens once at the end of the code 
