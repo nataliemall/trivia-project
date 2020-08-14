@@ -81,7 +81,7 @@ submit_button.addEventListener('click', () => {
     const name = document.getElementById('player_name').value;
 
     var ref_num2 = ref_num.innerHTML
-    console.log('ref num:', ref_num2)
+    console.log('ref num:', ref_num2) //question_id
 
     const mykey2 = { "name" : name, "guess" : player_answer, "ref_num" : ref_num2}     
     console.log("mykey2", mykey2)

@@ -382,7 +382,8 @@ app.put('/guess_update/', async (req, res) => {
     });
 
 
-app.get('/player_scores/', async (req, res) => {  //this should hopefully be obsolete?
+app.get('/player_scores/', async (req, res) => {  //this should hopefully be obsolete? - definitely not
+
   
   try {
 
@@ -411,17 +412,19 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
     console.log('player guesses', name13);
 
     client13.release();
+
     var player_name = name13[0];
     // player_name_json = JSON.stringify({name: player_name});
     player_name_json = JSON.stringify(name13);
     console.log('player_name_json', player_name_json)
 
 
-    let sql27 = 'SELECT * FROM trivia_questions WHERE id = $1';
-    const {rows: name27} = await client13.query(sql27, params);
-    var revealed_question = name27[0];
-    console.log('current question name27:', name27);
+    // let sql27 = 'SELECT * FROM trivia_questions WHERE id = $1';
+    // const {rows: name27} = await client13.query(sql27, params);
+    // var revealed_question = name27[0];
+    // console.log('current question name27:', name27);
 
+    // client13.release();
 
 
 
@@ -432,9 +435,37 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
   } 
 })
 
+
+app.get('/cumulative_scores/', async (req, res) => {  //sends the cumulative scores to score_page.js
+
+    try {
+
+        console.log('made it to line 443');
+        const client32 = await pool.connect();
+        let sql32 = 'SELECT name, cumulative_score FROM recent_guesses'
+        const {rows: name32} = await client32.query(sql32);
+        console.log('cumulative scores', name32);
+
+        cumulative_scores = JSON.stringify(name32)
+
+        res.send(cumulative_scores);
+
+    } catch (err) {
+        console.error(err);
+        res.send("Error on cumulative_scores side" + err);
+    }
+
+
+
+})
+
+
+
+
 app.put('/reveal_score/', async (req, res) => {  
     // updates revealed_question column of current_question data table 
     // to reveal score of new question
+    // will also re-accumulate total scores of active players 
 
     const name = req.body.name;
     console.log('player question', name);
@@ -451,10 +482,68 @@ app.put('/reveal_score/', async (req, res) => {
     let params25 = [ question_to_reveal  ]
     const  temp25  = await client25.query(sql25, params25 ); 
 
+
+    // re-accumulate total scores of active players: 
+
+    let sql28 = 'SELECT name FROM player_guesses WHERE question = $1';
+    const {rows: temp28} = await client25.query(sql28, params25 );
+    console.log('temp28', temp28);
+
+    // let sql29 = 'SELECT name, sum(points) AS total_score FROM player_guesses WHERE created_at > $1 AND name = $2 GROUP BY name'   
+    // // ^^ this is where to start tomorrow - put this in the loop below to add to the recent_guesses table
+    // // 'LEFT JOIN recent_guesses ON recent_guesses.name = player_guesses.name'
+    // // 'UPDATE '
+    // let params29 = [ '2020-08-08', 'Alice' ]
+    // const {rows: temp29} = await client25.query(sql29, params29 );
+    // console.log('temp29', temp29) //cumulate scores of each player
+
+    // select names of everyone who has played this round (or since a certain time)
+    // select totals for each of those players 
+    // update recent_guesses to show the cumulative score 
+
+    // var cumulative_scores = temp29[0] // use loop to retrieve every value
+    // console.log('cumulative_scores', cumulative_scores )
+    //insert cumulative scores into the recent_guesses data table
+
+
+    let sql30 = 'SELECT name FROM recent_guesses'
+    const {rows: temp30} = await client25.query(sql30)
+    console.log('names of participants:', temp30)
+
+
+    var i; 
+    for (i = 0; i < temp30.length; i++) {
+        console.log(temp30[i].name) // find each of these players' cumulative scores and place each of these into recent_guesses
+
+
+
+
+
+        let sql29 = 'SELECT name, sum(points) AS total_score FROM player_guesses WHERE created_at > $1 AND name = $2 GROUP BY name'   
+        // ^^ this is where to start tomorrow - put this in the loop below to add to the recent_guesses table
+        // 'LEFT JOIN recent_guesses ON recent_guesses.name = player_guesses.name'
+        // 'UPDATE '
+        let params29 = [ '2020-08-08', temp30[i].name ]
+        console.log('params29', params29)
+        const {rows: temp29} = await client25.query(sql29, params29 );
+        console.log('temp29', temp29) //cumulate scores of each player
+
+        var player_score = temp29[0].total_score;
+        console.log('player_score', player_score);
+
+        let sql31 = 'UPDATE recent_guesses SET cumulative_score = $1 WHERE name = $2' // use inner join to combine subset of recent_guesses with player_guesses
+        let params31 = [ temp29[0].total_score , temp30[i].name]
+        const {rows: temp31} = await client25.query(sql31, params31)
+
+
+    };
+    // for i in 
     client25.release();
+
+    res.send(cumulative_scores)
     }
 
-    console.log('reveal score code goes here');
+    // console.log('reveal score code goes here');
 })
 
 
@@ -497,7 +586,7 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 
     // var question_id = 8;  //hard-coded way  where the question is chosen 
 
-    let sql = 'SELECT id, question, answera, answerb, answerc, answerd FROM  trivia_questions WHERE id = $1';
+    let sql = 'SELECT id, question, answera, answerb, answerc, answerd, correctanswer FROM trivia_questions WHERE id = $1';
 
     // let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
     let params = [revealed_id_var];
@@ -518,7 +607,7 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
     // var combined_sender = Object.assign(temp25);
     var combined_sender = JSON.stringify({id: result.rows[0].id});
 
-    var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd })
+    var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
     console.log('combined', combined_sender2); 
     res.send(combined_sender2);
     

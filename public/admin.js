@@ -133,12 +133,12 @@ score_button.addEventListener('click', () => {
           } 
           }
           ).then(result => result.json())
-            .then(data => wasitcorrect(data))
-            .then(console.log('wasitcorrect has passed'))
-            .then( (player_eval) => {
-              window.location.href = 
-              "/results.html?Page=data&name=" + nameParam + "&question=" 
-              + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval; }) //is there a way to get the res.send file from this? 
+            // .then(data => wasitcorrect(data))
+            // .then(console.log('wasitcorrect has passed'))
+            // .then( (player_eval) => {
+            //   window.location.href = 
+            //   "/results.html?Page=data&name=" + nameParam + "&question=" 
+            //   + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval; }) //is there a way to get the res.send file from this? 
 
   }
 
@@ -150,11 +150,11 @@ score_button.addEventListener('click', () => {
   const bobcatStr = JSON.stringify(mykey2);
   console.log(bobcatStr);      
 
-  function displayMessage(message1) {   
+  // function displayMessage(message1) {   
 
-  //hacky way don't judge me
-    console.log('results message', message1); 
-    }
+  // //hacky way don't judge me
+  //   console.log('results message', message1); 
+  //   }
 
   refreshDisplay()
 
