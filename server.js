@@ -81,7 +81,7 @@ app.put('/current_q_update/', async (req, res) => {
 
 });
 
-app.put('/table_update/', async (req, res) => {
+app.put('/table_update/', async (req, res) => { //adds a question to the trivia_questions database
 
   try {
     const client = await pool.connect();
@@ -166,7 +166,7 @@ app.get('/retrieve_list/', async (req, res) => {
 
 
 app.get('/retrieve_question/', async (req, res) => {
-
+    console.log('made it inside "retrieve quesion" ' )
   try{
 
     //reaches into current_question table to retrieve current question
@@ -289,17 +289,20 @@ app.put('/guess_update/', async (req, res) => {
     // console.log('guess_idTEST', guess_id_formatted23 )
 
 
-        original_submission = 2
-        console.log('refresh test');
-        if (temp23_ids) { //if this is an emply array, it means there hasn't been a previous answer submission
+    original_submission = 2
+    console.log('refresh test');
+    if (temp23_ids) { //if this is an emply array, it means there hasn't been a previous answer submission
 
-            var original_submission = 0;
-            console.log('repeat player');
+        var original_submission = 0;
+        console.log('repeat player');
 
-         } else {
-            console.log('nonrepeater');
-            var original_submission = 1;
-        }
+        var submission_string = JSON.stringify({grade :original_submission});
+        res.send(submission_string);
+
+     } else {
+        console.log('nonrepeater');
+        var original_submission = 1;
+    }
 
     try {
 
@@ -347,7 +350,7 @@ app.put('/guess_update/', async (req, res) => {
     var answer_key = test11[0];
     var correct_answer = answer_key.correctanswer
     // client.release(); //changed from 'release' to 'end'  //this was a type release statement 
-
+    client11.release()
     if (correct_answer == guess) {
       console.log('answer was correct! direct to results page')
       const client12 = await pool.connect();
@@ -355,7 +358,7 @@ app.put('/guess_update/', async (req, res) => {
       let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1 AND name = $2';
       let params12 = [ref_num, name];
       client12.query(sql12, params12);
-
+      client12.release();
 
       console.log(params11);
 
@@ -372,7 +375,7 @@ app.put('/guess_update/', async (req, res) => {
     } else {
         console.log('Player already submitted');
     }
-  client11.release();
+  // client11.release();
   } catch (err) {
     console.error(err);
     res.send("Error " + err);
@@ -449,7 +452,7 @@ app.get('/cumulative_scores/', async (req, res) => {  //sends the cumulative sco
         cumulative_scores = JSON.stringify(name32)
 
         res.send(cumulative_scores);
-
+        client32.release();
     } catch (err) {
         console.error(err);
         res.send("Error on cumulative_scores side" + err);

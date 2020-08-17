@@ -1,5 +1,5 @@
 //triva-crowds
-var question_submission_mode = 0; 
+var question_submission_mode = 1; 
 
 console.log('hello from the client side')
 

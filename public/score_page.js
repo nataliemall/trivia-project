@@ -15,17 +15,25 @@ function displayQuestion(message1) {
   var correctanswer = message1.correctanswer
 
   function generateTableHead(table) {
-  let thead = table.createTHead();
-  let row = thead.insertRow();
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    for (let key of data) {
+      let th = document.createElement("th");
+      let text = document.createTextNode(key);
+      th.appendChild(text);
+      row.appendChild(th);
+    }
   }
 
   let table = document.querySelector("table");
+  let data = ['Correct Answer:', correctanswer];
   generateTableHead(table);
 
   answers.innerHTML =  ( 'A) ' + message1.answera + '<br>' );
   answers.innerHTML += ( 'B) ' + message1.answerb + '<br>' );
   answers.innerHTML += ( 'C) ' + message1.answerc + '<br>' );
   answers.innerHTML += ( 'D) ' + message1.answerd + '<br>' );
+
   }
 
 
@@ -35,7 +43,7 @@ function refreshDisplay() {
       )
     .then(data => displayQuestion(data)
       )
-    .catch(error => console.log('There was an error', error));
+    .catch(error => console.log('There was an error', error))
 }
 
 
@@ -44,7 +52,7 @@ console.log('table', table);
 
 
 
-function displayMessage(scores) {   
+function displayMessage(scores) {   // displays players' most recent guesses
   // console.log('scores', scores);
   // console.log(scores[0])
 
@@ -54,6 +62,7 @@ function displayMessage(scores) {
     var row = table.insertRow(i+1);
     var cell1 = row.insertCell(0)
     cell1.innerHTML = scores[i].name;
+    
 
     var cell2 = row.insertCell(1)
     cell2.innerHTML = scores[i].guess;
@@ -135,7 +144,6 @@ function display_cumulative_scores() {
 };
 
 refreshDisplay();
-
 
 function display_updates() {
   display_results()
