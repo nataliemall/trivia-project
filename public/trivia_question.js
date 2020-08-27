@@ -32,7 +32,11 @@ function wasitcorrect(data){
       //put here to insert warning that player already submitted 
     } else if (player_eval == 5) {
       console.log('Wrong question! Try refreshing')
-      setTimeout(function(){ alert("Sorry, wrong question, try refreshing the page!"); }, 1000);
+      setTimeout(function(){ alert("Whoops, wrong question, try refreshing the page!"); }, 1000);
+
+    } else if (player_eval == 6) {
+      console.log('Sorry, answer has already been revealed')
+      setTimeout(function(){ alert("Sorry, the answer has already been revealed, better luck next time!"); }, 1000);
 
     } else {
     return player_eval;

@@ -294,7 +294,7 @@ app.put('/guess_update/', async (req, res) => {
     // console.log('guess_idTEST', guess_id_formatted23 )
 
 
-    original_submission = 2
+    // original_submission = 2
     console.log('refresh test');
     if (temp23_ids) { //if this is an emply array, it means there hasn't been a previous answer submission
 
@@ -312,7 +312,7 @@ app.put('/guess_update/', async (req, res) => {
 
     // tests if submitting on the correct page
     var q_title = 'Test';
-    let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
+    let sql_q_id = 'SELECT id, revealed_question FROM current_question WHERE question_written = $1';
     let q_params = [q_title];
     const q_client = await pool.connect();
     const { rows: q_name } = await q_client.query(sql_q_id, q_params)
@@ -321,29 +321,34 @@ app.put('/guess_update/', async (req, res) => {
     console.log('q_unbracketed', q_unbracketed);
 
     var question_id_var = parseInt(q_unbracketed.id);
+    var revealed_q = parseInt(q_unbracketed.revealed_question);
     console.log('*****');
     console.log('question_id_var', question_id_var);  // checkout 
     console.log('ref_num', parseInt(ref_num));
+    console.log('revealed_q', revealed_q);
     var ref_num_int = parseInt(ref_num);
 
 
-    if (question_id_var !== ref_num_int) { //checkout - why wouldn't these two be equal?
+    if (question_id_var !== ref_num_int) { //submitted question must be the current question in order to proceed
+        // (otherwise will get caught in this step)
 
         var original_submission = 5;
         console.log('Wrong question');
 
         var submission_string = JSON.stringify({grade :original_submission});
         res.send(submission_string);
+
+    } else if (ref_num_int == revealed_q) { //will get caught here if the submitted question is also the revealed question
+        console.log('question already revealed');
+        var original_submission = 6;
+        var submission_string = JSON.stringify({grade :original_submission});
+        res.send(submission_string);        
+
     } else {
         console.log('user on correct question page')
-    
-
-
-
     try {
-
-    console.log('original_submission value', original_submission);
-        if  (original_submission == 1) {
+        console.log('original_submission value', original_submission);
+        if  (original_submission == 1) { //occurs if player has not yes submitted for this question
         const client = await pool.connect();
         // var id = 7;
         // var name = question;
@@ -358,72 +363,66 @@ app.put('/guess_update/', async (req, res) => {
         client.release(); //changed from 'release' to 'end'
 
 
-    const client22 = await pool.connect();
-    let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
+        const client22 = await pool.connect();
+        let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
+        const  temp  = await client22.query(sql14, params ); //this was where it went wonky - July 31 2020
 
-    const  temp  = await client22.query(sql14, params ); //this was where it went wonky - July 31 2020
-
-
-    console.log('temp', temp.rows)
+        console.log('temp', temp.rows)
     //add error catch here for if more than one ID comes up (i.e. answered twice)
-    var temp_ids = temp.rows[0];
-    console.log('temp_ids', temp_ids)
-    var guess_id_formatted = temp_ids.id;
+        var temp_ids = temp.rows[0];
+        console.log('temp_ids', temp_ids)
+        var guess_id_formatted = temp_ids.id;
  
-    client22.release();
+        client22.release();
 
 
-    console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
+        console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
     //send guess_id along to the front end - then use this to extract the correct eval
 
 
+        const client11 = await pool.connect();
+        let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
+        let params11 = [ref_num];
+        console.log(params11);
+        const  { rows: test11 } = await client11.query(sql11, params11);
 
+        console.log('test11', test11[0]);
+        var answer_key = test11[0];
+        var correct_answer = answer_key.correctanswer
+        // client.release(); //changed from 'release' to 'end'  //this was a type release statement 
+        client11.release()
+        if (correct_answer == guess) {
+          console.log('answer was correct! direct to results page')
+          const client12 = await pool.connect();
+          // let sql12 = 'UPDATE (points) FROM player_guesses WHERE id = $1'
+          let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1 AND name = $2';
+          let params12 = [ref_num, name];
+          client12.query(sql12, params12);
+          client12.release();
 
+          console.log(params11);
 
-    const client11 = await pool.connect();
-    let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
-    let params11 = [ref_num];
-    console.log(params11);
-    const  { rows: test11 } = await client11.query(sql11, params11);
+          var current_grade = 'correct';
+          //thing to do if correct answer 
+        } else {
+          console.log('answer incorrect');
+          var current_grade = 'incorrect';
+        } 
+        var current_grade_string = JSON.stringify({grade :current_grade});
+        console.log('grade string', current_grade_string);
+        res.send( current_grade_string );  // do we actually want to send anything?
 
-    console.log('test11', test11[0]);
-    var answer_key = test11[0];
-    var correct_answer = answer_key.correctanswer
-    // client.release(); //changed from 'release' to 'end'  //this was a type release statement 
-    client11.release()
-    if (correct_answer == guess) {
-      console.log('answer was correct! direct to results page')
-      const client12 = await pool.connect();
-      // let sql12 = 'UPDATE (points) FROM player_guesses WHERE id = $1'
-      let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1 AND name = $2';
-      let params12 = [ref_num, name];
-      client12.query(sql12, params12);
-      client12.release();
-
-      console.log(params11);
-
-      var current_grade = 'correct';
-      //thing to do if correct answer 
-    } else {
-      console.log('answer incorrect');
-      var current_grade = 'incorrect';
-    } 
-    var current_grade_string = JSON.stringify({grade :current_grade});
-    console.log('grade string', current_grade_string);
-    res.send( current_grade_string );  // do we actually want to send anything?
-
-    } else {
-        console.log('Player already submitted');
-    }
+        } else {
+            console.log('Player already submitted');
+        }
   // client11.release();
-  } catch (err) {
-    console.error(err);
-    res.send("Error " + err);
-  } 
-  
-}
+    } catch (err) {
+        console.error(err);
+        res.send("Error " + err);
+    } 
 
-      
+    }
+
     });
 
 
@@ -500,10 +499,7 @@ app.get('/cumulative_scores/', async (req, res) => {  //sends the cumulative sco
         res.send("Error on cumulative_scores side" + err);
     }
 
-
-
 })
-
 
 
 
