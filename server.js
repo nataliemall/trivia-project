@@ -44,7 +44,7 @@ try {
 app.put('/current_q_update/', async (req, res) => {
 // for admin to update the current question available to players
 
-  // try {
+  try {
 
     //select the current 
     const name = req.body.name;
@@ -61,11 +61,11 @@ app.put('/current_q_update/', async (req, res) => {
     let sql24 = 'UPDATE current_question SET id = $1';
     let params24 = [ question_id  ]
     const  temp23  = await client24.query(sql24, params24 ); 
-    console.log('temp24', temp24.rows)
-    //add error catch here for if more than one ID comes up (i.e. answered twice)
+    // console.log('temp24', temp24.rows)
+    // //add error catch here for if more than one ID comes up (i.e. answered twice)
     
-    var temp24_ids = temp24.rows[0];
-    console.log('temp24_ids', temp24_ids);
+    // var temp24_ids = temp24.rows[0];
+    // console.log('temp24_ids', temp24_ids);
     // var guess_id_formatted23 = temp23_ids.id;
 
     client24.release();
@@ -78,6 +78,11 @@ app.put('/current_q_update/', async (req, res) => {
         console.log('response2', response2);
         res.send(response2);
     }
+
+} catch (err) {
+    console.error(err);
+    res.send("Error in adding question: ", err);
+}
 
 });
 
@@ -247,7 +252,7 @@ app.put('/guess_update/', async (req, res) => {
     const name = req.body.name;
     // const player_answer = req.body.player_answer; //"${message}"
     const guess = req.body.guess;
-    const ref_num = req.body.ref_num;
+    const ref_num = req.body.ref_num; // question number from html page
     // console.log('message', question);
     console.log('player guess', name, guess, ref_num);
     var original_submission = 2;  //declare this variable outside the function so it's defined later & accessible
@@ -304,6 +309,37 @@ app.put('/guess_update/', async (req, res) => {
         var original_submission = 1;
     }
 
+
+    // tests if submitting on the correct page
+    var q_title = 'Test';
+    let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
+    let q_params = [q_title];
+    const q_client = await pool.connect();
+    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+    q_client.release();    
+    var q_unbracketed = q_name[0];
+    console.log('q_unbracketed', q_unbracketed);
+
+    var question_id_var = parseInt(q_unbracketed.id);
+    console.log('*****');
+    console.log('question_id_var', question_id_var);  // checkout 
+    console.log('ref_num', parseInt(ref_num));
+    var ref_num_int = parseInt(ref_num);
+
+
+    if (question_id_var !== ref_num_int) { //checkout - why wouldn't these two be equal?
+
+        var original_submission = 5;
+        console.log('Wrong question');
+
+        var submission_string = JSON.stringify({grade :original_submission});
+        res.send(submission_string);
+    } else {
+        console.log('user on correct question page')
+    
+
+
+
     try {
 
     console.log('original_submission value', original_submission);
@@ -339,6 +375,10 @@ app.put('/guess_update/', async (req, res) => {
 
     console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
     //send guess_id along to the front end - then use this to extract the correct eval
+
+
+
+
 
     const client11 = await pool.connect();
     let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
@@ -380,6 +420,8 @@ app.put('/guess_update/', async (req, res) => {
     console.error(err);
     res.send("Error " + err);
   } 
+  
+}
 
       
     });
@@ -621,6 +663,35 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 
   console.log('test retrieve question')
 })
+
+
+
+app.get('/check_current_question/', async (req, res) => {
+    //checks that question for submission is the up-to-date one, otherwise refreshes page- OBsolete??
+    console.log('made it inside "check_current_question" ' )
+  try{
+
+    //reaches into current_question table to retrieve current question
+    var q_title = 'Test';
+    let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
+    let q_params = [q_title];
+    const q_client = await pool.connect();
+    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+    q_client.release();    
+    var q_unbracketed = q_name[0];
+    console.log('q_unbracketed', q_unbracketed);
+
+    var question_id_var = q_unbracketed.id;
+    console.log('question_id_var', question_id_var);
+
+    } catch (err) {
+        console.log(err)
+    }
+    } );
+
+
+
+
 
 
 //port listening, which happens once at the end of the code 

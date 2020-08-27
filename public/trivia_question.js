@@ -26,10 +26,14 @@ function wasitcorrect(data){
     console.log('player_eval:', player_eval);
     if (player_eval == 0) {
       const repeat = document.getElementById('already_submitted');
-      repeat.innerHTML = 'Sorry, you already submitted an answer';
+      repeat.innerHTML = 'Sorry, you already submitted an answer';  // pandu how to prevent from continuing to the next page 
       // setTimeout(function() {}, 10);
-      setTimeout(function(){ alert("Hello"); }, 3000);
+      setTimeout(function(){ alert("Sorry, you've already submitted an answer!"); }, 1000);
       //put here to insert warning that player already submitted 
+    } else if (player_eval == 5) {
+      console.log('Wrong question! Try refreshing')
+      setTimeout(function(){ alert("Sorry, wrong question, try refreshing the page!"); }, 1000);
+
     } else {
     return player_eval;
     };
@@ -89,7 +93,7 @@ submit_button.addEventListener('click', () => {
     const name = document.getElementById('player_name').value;
 
     var ref_num2 = ref_num.innerHTML
-    console.log('ref num:', ref_num2) //question_id
+    console.log('ref num:', ref_num2) //question_id - compare this number to current_question.id
 
     const mykey2 = { "name" : name, "guess" : player_answer, "ref_num" : ref_num2}     
     console.log("mykey2", mykey2)
@@ -111,11 +115,16 @@ submit_button.addEventListener('click', () => {
       }
       ).then(result => result.json())
         .then(data => wasitcorrect(data))
-        .then(console.log('wasitcorrect has passed'))
+        // .then(console.log('wasitcorrect has passed'))
         .then( (player_eval) => {
+          console.log('player_eval', player_eval)
+
+          if (player_eval) {
           window.location.href = 
           "/results.html?Page=data&name=" + nameParam + "&question=" 
           + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval;
+          }
+
           }) //is there a way to get the res.send file from this? 
 
     // fetch('/')
