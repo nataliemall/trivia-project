@@ -28,18 +28,20 @@ router.use(bodyParser.json());
 app.use(express.static('public'));
 
 
-app.get('/db', async (req, res) => {     //creating the database if postgresQL
-try {
-  const client = await pool.connect();
-  const result = await client.query('SELECT * FROM trivia_questions');
-  const results = { 'results': (result) ? result.rows : null};
-  res.send( results );
-  client.release();
-} catch (err) {
-  console.error(err);
-  res.send("Error " + err);
-} 
-})
+app.get('/db', async (req, res) => {     
+//creating the database if postgresQL
+    try {
+      const client = await pool.connect();
+      const result = await client.query('SELECT * FROM trivia_questions');
+      const results = { 'results': (result) ? result.rows : null};
+      res.send( results );
+      client.release();
+    } catch (err) {
+      console.error(err);
+      res.send("Error " + err);
+    } 
+    })
+
 
 app.put('/current_q_update/', async (req, res) => {
 // for admin to update the current question available to players
@@ -79,14 +81,15 @@ app.put('/current_q_update/', async (req, res) => {
         res.send(response2);
     }
 
-} catch (err) {
-    console.error(err);
-    res.send("Error in adding question: ", err);
-}
+    } catch (err) {
+        console.error(err);
+        res.send("Error in adding question: ", err);
+    }
+    });
 
-});
 
-app.put('/table_update/', async (req, res) => { //adds a question to the trivia_questions database
+app.put('/table_update/', async (req, res) => { 
+//adds a question to the trivia_questions database
 
   try {
     const client = await pool.connect();
@@ -103,26 +106,23 @@ app.put('/table_update/', async (req, res) => { //adds a question to the trivia_
     console.log('message', question);
     console.log('answers', name, answerA, answerB, answerC, answerD, correct_answer);
 
-
     let sql = 'INSERT INTO trivia_questions (name, question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6, $7)';
     let params = [ name, question, answerA, answerB, answerC, answerD, correct_answer ];
-
     client.query(sql, params, function(err) {
-// make sure you handle errors from here as well,
-// including signaling `res` and `done`
+    // make sure you handle errors from here as well,
+    // including signaling `res` and `done`
     }); 
-
     res.send( "sent" );  // do we actually want to send anything?
     client.release(); //changed from 'release' to 'end'
   } catch (err) {
     console.error(err);
     res.send("Error " + err);
-  } 
-      
+  }    
     });
 
 
 app.get('/retrieve_list/', async (req, res) => {
+// retrieves list of trivia questions for admin selection
 
     var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 20';
     // var id_list = 'SELECT '
@@ -159,15 +159,13 @@ app.get('/retrieve_list/', async (req, res) => {
     console.log('test2', test2)
 
     console.log('object_list', q_object)
-
-
     console.log('complete_list', complete_list, id_list)
 
     var question_list = 'question_list_placeholder'
     var question_obj = Object.assign(test2);
     res.send(q_object);
 
-});
+    });
 
 
 app.get('/retrieve_question/', async (req, res) => {
@@ -223,28 +221,8 @@ app.get('/retrieve_question/', async (req, res) => {
   console.log('test retrieve question')
 })
 
-
-// app.put('/retrieve_question/', async (req, res) => { //obsolete? 
-
-//   try {
-//     const client = await pool.connect();
-
-//     //select the current 
-//     const message = req.body.mykey; //"${message}"
-//     console.log('message', message);
-
-//     res.send( "sent" );  // do we actually want to send anything?
-//     client.release(); //changed from 'release' to 'end'
-//   } catch (err) {
-//     console.error(err);
-//     res.send("Error " + err);
-//   } 
-
-//     });
-
-
 app.put('/guess_update/', async (req, res) => {
-// await fakeNetworkDelay();
+// updates player's guess into the server, checking beforehand that player hasn't already submitted 
 
   // try {
 
@@ -292,7 +270,6 @@ app.put('/guess_update/', async (req, res) => {
 
     console.log('orderPromise', orderPromise)
     // console.log('guess_idTEST', guess_id_formatted23 )
-
 
     // original_submission = 2
     console.log('refresh test');
@@ -423,10 +400,10 @@ app.put('/guess_update/', async (req, res) => {
 
     }
 
-    });
+});
 
 
-app.get('/player_scores/', async (req, res) => {  //this should hopefully be obsolete? - definitely not
+app.get('/player_scores/', async (req, res) => {  
 
   
   try {
@@ -443,10 +420,6 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
     var revealed_id_var = q_unbracketed.revealed_question;
     console.log('revealed_id_var', revealed_id_var);
 
-
-
-
-
     const client13 = await pool.connect();
     let sql13 = 'SELECT * FROM player_guesses WHERE question = $1'; //needs to update according to question
     // params = ['53']; //hard-coded for now - fix this
@@ -462,16 +435,6 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
     player_name_json = JSON.stringify(name13);
     console.log('player_name_json', player_name_json)
 
-
-    // let sql27 = 'SELECT * FROM trivia_questions WHERE id = $1';
-    // const {rows: name27} = await client13.query(sql27, params);
-    // var revealed_question = name27[0];
-    // console.log('current question name27:', name27);
-
-    // client13.release();
-
-
-
     res.send(player_name_json);
   } catch (err) {
     console.error(err);
@@ -480,7 +443,8 @@ app.get('/player_scores/', async (req, res) => {  //this should hopefully be obs
 })
 
 
-app.get('/cumulative_scores/', async (req, res) => {  //sends the cumulative scores to score_page.js
+app.get('/cumulative_scores/', async (req, res) => {  
+//sends the cumulative scores to score_page.js
 
     try {
 
@@ -498,9 +462,7 @@ app.get('/cumulative_scores/', async (req, res) => {  //sends the cumulative sco
         console.error(err);
         res.send("Error on cumulative_scores side" + err);
     }
-
 })
-
 
 
 app.put('/reveal_score/', async (req, res) => {  
@@ -564,7 +526,7 @@ app.put('/reveal_score/', async (req, res) => {
         // ^^ this is where to start tomorrow - put this in the loop below to add to the recent_guesses table
         // 'LEFT JOIN recent_guesses ON recent_guesses.name = player_guesses.name'
         // 'UPDATE '
-        let params29 = [ '2020-08-08', temp30[i].name ]
+        let params29 = [ '2020-20-08', temp30[i].name ]  //HERE
         console.log('params29', params29)
         const {rows: temp29} = await client25.query(sql29, params29 );
         console.log('temp29', temp29) //cumulate scores of each player
@@ -661,7 +623,6 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 })
 
 
-
 app.get('/check_current_question/', async (req, res) => {
     //checks that question for submission is the up-to-date one, otherwise refreshes page- OBsolete??
     console.log('made it inside "check_current_question" ' )
@@ -684,10 +645,6 @@ app.get('/check_current_question/', async (req, res) => {
         console.log(err)
     }
     } );
-
-
-
-
 
 
 //port listening, which happens once at the end of the code 
