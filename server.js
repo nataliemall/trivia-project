@@ -466,9 +466,9 @@ app.get('/cumulative_scores/', async (req, res) => {
 
 
 app.put('/reveal_score/', async (req, res) => {  
-    // updates revealed_question column of current_question data table 
-    // to reveal score of new question
-    // will also re-accumulate total scores of active players 
+// updates revealed_question column of current_question data table 
+// to reveal score of new question
+// will also re-accumulate total scores of active players 
 
     const name = req.body.name;
     console.log('player question', name);

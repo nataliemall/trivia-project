@@ -7,13 +7,14 @@ const buttona = document.getElementById('optiona');
 const submit_button = document.getElementById('submit_button');
 
 var passed_id = '9';
+// var player_eval = 'tbd'
 
-function refreshDisplay() {
+function refreshRetrieval() {
   fetch('/retrieve_question/') // gets /api/messages (GET is the default)
     .then(result => result.json() // console.log(result) 
       )
     // .then(console.log(result))
-    .then(data => displayMessage(data)
+    .then(data => displayCurrentQ(data)
       )
     .catch(error => console.log('There was an error', error));
 }
@@ -46,7 +47,7 @@ function wasitcorrect(data){
 }
 
 
-function displayMessage(message1) {   
+function displayCurrentQ(message1) {   
 
 
   displayElement.innerHTML = message1['question'];   // clear old stuff in displayElement:
@@ -57,10 +58,10 @@ function displayMessage(message1) {
   'TESTbutton2';
 
   var r = document.getElementsByTagName("label");  
-  r[1].innerHTML = message1['answera'];
-  r[2].innerHTML = message1['answerb'];
-  r[3].innerHTML = message1['answerc'];
-  r[4].innerHTML = message1['answerd'];
+  r[0].innerHTML = message1['answera'];
+  r[1].innerHTML = message1['answerb'];
+  r[2].innerHTML = message1['answerc'];
+  r[3].innerHTML = message1['answerd'];
 
 }
 
@@ -76,9 +77,12 @@ const bobcatStr = JSON.stringify(mykey2);
 console.log(bobcatStr);
 
 
-refreshDisplay();
+refreshRetrieval();
 
 submit_button.addEventListener('click', () => {
+
+
+    async function getPlayerSubmission() {
 
     if (document.getElementById("optiona").checked == true) {
         var player_answer = 'A'
@@ -110,7 +114,7 @@ submit_button.addEventListener('click', () => {
     var guessParam = player_answer;
 
 
-    fetch('/guess_update/', {
+    var player_eval = await fetch('/guess_update/', {
       method: 'PUT',
       body: bobcatStr,
       headers: {
@@ -124,11 +128,15 @@ submit_button.addEventListener('click', () => {
           console.log('player_eval', player_eval)
 
           if (player_eval) {
-          window.location.href = 
-          "/results.html?Page=data&name=" + nameParam + "&question=" 
-          + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval;
-          }
 
+          console.log('player_eval has a value:', player_eval);
+          // window.location.href = 
+          // "/results.html?Page=data&name=" + nameParam + "&question=" 
+          // + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval;
+
+
+          }
+          return player_eval
           }) //is there a way to get the res.send file from this? 
 
     // fetch('/')
@@ -146,7 +154,266 @@ submit_button.addEventListener('click', () => {
 
  
 
+
+// ******************* Individual player eval ****************
+
+// const displayElement = document.getElementById('evaluation');
+
+// - get name index 
+// - ask server for "correct" vs "incorrect" value
+// - update gif accordingly
+// - currently the submission form cannot both updated the database (/guess_update/) 
+//   and redirect to the results page  
+
+// const queryString = window.location.search;
+// console.log(queryString);
+// const urlParams = new URLSearchParams(queryString);
+// const player_name = urlParams.get('name');
+// const player_guess = urlParams.get('guess');
+// const current_question = urlParams.get('question');
+// const player_eval = urlParams.get('player_eval');
+
+// console.log(player_name, player_guess, current_question);
+
+  return player_eval;
+  }
+
+
+    async function displayInvidualEval(player_eval) {   
+
+      let playerEval = await getPlayerSubmission()
+
+      console.log('player eval after submitting:', playerEval)
+      // console.log('player eval after submitting:', player_eval);
+
+      if (playerEval == 'correct') {
+        console.log('player is correct');
+
+        var randomInt = Math.floor(Math.random() * 10);
+
+        // case randomInt == 1
+        switch (randomInt) {
+          case 0:
+            document.getElementById("myImg").src = "/success_folder/happykitty.gif";
+                    document.getElementById("evaluation").innerHTML = 'Correct!'
+
+            var test = '0';
+            break;
+          case 1: 
+            document.getElementById("myImg").src = "/success_folder/success_baby.jpg";
+                    document.getElementById("evaluation").innerHTML = 'Correct!'
+
+            var test = '1';
+            break;
+          case 2:
+            document.getElementById("myImg").src = "/success_folder/spongebob.jpg";
+                        document.getElementById("myImg").height = "300";
+
+                    document.getElementById("evaluation").innerHTML = 'Correct!'
+            var test = '2';
+            break;
+          case 3:
+            document.getElementById("myImg").src = "/success_folder/willywonka.jpg";
+            document.getElementById("myImg").height = "300";
+
+            document.getElementById("evaluation").innerHTML = 'Your doing pretty well'
+
+            var test = '3';
+            break;
+          case 4:
+                  document.getElementById("evaluation").innerHTML = 'Correct!'
+
+            var test = '4';
+            break;
+          case 5:
+                  document.getElementById("evaluation").innerHTML = 'Correct!'
+
+            var test = '5';
+            break;
+          default: 
+            document.getElementById("evaluation").innerHTML = 'Correct!'
+
+        }
+
+      console.log('randomInt', randomInt)
+
+
+        // document.getElementById("evaluation").innerHTML = 'Correct!'
+      } else {
+        console.log('player is incorrect');
+        // document.getElementById("myImg").src ="Pouty Yellow Cat GIF.gif"
+        document.getElementById("evaluation").innerHTML = 'Sorry, better luck next time!'
+
+      } 
+
+
+
+        
+
+    }
+
+    displayInvidualEval();
+
 })
+
+
+
+// ***************** SCORE PAGE ********************
+
+
+console.log('hello from the score_page')
+
+const displayPastQuestion = document.getElementById('past_question');
+const answers = document.getElementById('past_answers');
+
+
+function displayQuestion(message1) {   
+
+  console.log('message1', message1);
+  // console.log(message1[1])
+  
+  displayPastQuestion.innerHTML = message1.question;
+  var info = Object.keys(message1).length;
+
+  var correctanswer = message1.correctanswer
+
+  function generateTableHead(table) {
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    for (let key of data) {
+      let th = document.createElement("th");
+      let text = document.createTextNode(key);
+      th.appendChild(text);
+      row.appendChild(th);
+    }
+  }
+
+  let table = document.querySelector("table");
+  let data = ['Correct Answer:', correctanswer];
+  generateTableHead(table);
+
+  answers.innerHTML =  ( 'A) ' + message1.answera + '<br>' );
+  answers.innerHTML += ( 'B) ' + message1.answerb + '<br>' );
+  answers.innerHTML += ( 'C) ' + message1.answerc + '<br>' );
+  answers.innerHTML += ( 'D) ' + message1.answerd + '<br>' );
+
+  }
+
+
+function refreshDisplay() {
+  fetch('/retrieve_revealed_question/') // gets /api/messages (GET is the default)
+    .then(result => result.json() // console.log(result) 
+      )
+    .then(data => displayQuestion(data)
+      )
+    .catch(error => console.log('There was an error', error))
+}
+
+
+var table = document.getElementById("scoreTable");
+console.log('table', table);
+
+
+
+function displayMessage(scores) {   // displays players' most recent guesses
+  // console.log('scores', scores);
+  // console.log(scores[0])
+
+  var i;
+  for (i = 0; i < scores.length; i++) {
+    // text += cars[i] + "<br>";
+    var row = table.insertRow(i+1);
+    var cell1 = row.insertCell(0)
+    cell1.innerHTML = scores[i].name;
+    
+
+    var cell2 = row.insertCell(1)
+    cell2.innerHTML = scores[i].guess;
+
+  }
+
+}
+
+async function display_results() {
+
+    fetch('/player_scores/')
+    .then(result => result.json() // console.log(result) 
+      )
+    .then(data => displayMessage(data)
+      )
+    .catch(error => console.log('There was an error', error));
+
+};
+
+
+function displayTotals(cumulative_scores) {   //still needs to be updated 
+
+  console.log('inside cumulative_scores function');
+  try {
+  console.log('cumulative_scores', cumulative_scores);
+
+  console.log('cumulative as object', cumulative_scores[0])
+
+
+  var lengthm = cumulative_scores.length;
+  var cumulativeTable = document.getElementById("cumulativeTable");
+  var i;
+  console.log('table2', table);
+  for (i = 0; i < cumulative_scores.length; i++) {
+    // text += cars[i] + "<br>";
+    // var row = table.insertRow(i+1);
+    console.log('cumulative_scores_array_val', cumulative_scores[i])
+    var name = cumulative_scores[i].name;
+    console.log('name', name)
+    // find where "name" == name in the table, else insert row 
+    try {
+      // new idea: just put scores in a new table 
+
+      var row = cumulativeTable.insertRow(i+1);
+      var cell1 = row.insertCell(0)
+      cell1.innerHTML = cumulative_scores[i].name;
+
+      var cell2 = row.insertCell(1)
+      cell2.innerHTML = cumulative_scores[i].cumulative_score;
+
+
+      // var j; 
+      // var displayed_names = cumulativeTable.rows[1].cells.item(0).innerHTML;
+      // console.log('displayed_names', displayed_names);
+
+      // console.log('inserting first player here under written player name');
+      // var cell1 = table.insertCell(2);  //update cell with matching name with score in 3rd column 
+      // cell1.innerHTML = cumulative_scores[i].cumulative_score;   //add cumulative scores 
+    } catch (err) {
+      console.log('creating new player row for person who did not guess this round', err);
+    }
+  }
+
+  } catch (err) {
+    console.log('error in displaying cumulative score', (err))
+  }
+
+}
+
+function display_cumulative_scores() {
+  fetch('/cumulative_scores/')
+  .then(console.log('already fetched cumulative_scores'))
+  .then(result => result.json()
+    )
+  .then(console.log('result achieved'))
+  .then(data => displayTotals(data)
+    )
+  .catch(error => console.log('Error in displaying cumulative_scores', error))
+};
+
+refreshDisplay();
+
+function display_updates() {
+  display_results()
+  .then(display_cumulative_scores())
+}
+
+display_updates();
 
 
 

@@ -29,12 +29,6 @@
 <!-- <form> -->
 
 
-<section class = "gen_info">
-  <label for = "name">Enter your name here</label>
-  <!-- Will eventually be a drop-down menu -->
-  <input type="text" name="player_name" id="player_name" maxlength="20"> <!-- pattern = "[a-zA-Z]+" --> 
-</section>
-
 <h2> Submit your best guess to the following trivia question: </h2>
 
 <div id = "form_body" style="
@@ -67,6 +61,14 @@
 
 </section>
 
+
+<section class = "gen_info">
+  <label for = "name">Enter your name here</label>
+  <!-- Will eventually be a drop-down menu -->
+  <input type="text" name="player_name" id="player_name" maxlength="20"> <!-- pattern = "[a-zA-Z]+" --> 
+</section>
+
+
 <section class="submission">
   <input type="submit" value="Submit" id = 'submit_button'>
 </section>
@@ -90,6 +92,70 @@
 </div>
 
 </form>
+
+
+<!-- ******************* Player results ****************** -->
+<br>
+<br>
+
+<div id = "evaluation">
+    <!-- Your answer was...  -->
+</div>
+
+<br>
+
+<IMG id="myImg">
+
+
+<!-- ************** Cumulate results *************** -->
+<h4>Player Results from past question: <br> (Refresh when admin reveals scores)</h4>
+
+
+<div id = "past_question">
+    Question:
+</div>
+<br>
+<div id = "past_answers">
+  answers:
+</div>
+
+<table>
+  <!-- table with question answers here -->
+</table>
+
+<br>
+<br>
+
+<table id = "scoreTable">
+  <tr>
+    <th>Name</th>
+    <th>Guess</th>
+    <!-- <th>Total Score</th> -->
+  </tr>
+
+</table>
+
+<br>
+<br>
+<br>
+
+<table id = "cumulativeTable">
+  <tr>
+    <th>Name</th>
+    <!-- <th>Guess</th> -->
+    <th>Cumulative Score</th>
+  </tr>
+
+</table>
+
+<!-- </html> -->
+
+    <!-- <script src = 'score_page.js'></script> -->
+
+  <!-- </body> -->
+
+
+
 
     <script src = 'trivia_question.js'></script>
   </body>
