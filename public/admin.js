@@ -107,13 +107,21 @@ submit_button.addEventListener('click', () => {
       } 
       }).then((result) => result.json()
       ).then((variable) => {
-        console.log('returned val', variable)
-        var response_text = JSON.stringify(variable.incorrect);
-        submission_response.innerHTML = response_text;
+        try{
+          console.log('question update:', variable)
+          var response_text = JSON.stringify(variable.response);
+          console.log('question text:', variable.response);
+
+
+          submission_response.innerHTML = response_text;
+        } catch {
+          console.log('Something else went wrong')
+        }
+
       });
 
     console.log('TEST');
-})
+    })
 
 score_button.addEventListener('click', () => {
 
@@ -132,7 +140,8 @@ score_button.addEventListener('click', () => {
           'Content-Type': 'application/json'
           } 
           }
-          ).then(result => result.json())
+          )
+          // ).then(result => result.json())
             // .then(data => wasitcorrect(data))
             // .then(console.log('wasitcorrect has passed'))
             // .then( (player_eval) => {
@@ -140,7 +149,7 @@ score_button.addEventListener('click', () => {
             //   "/results.html?Page=data&name=" + nameParam + "&question=" 
             //   + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval; }) //is there a way to get the res.send file from this? 
 
-  }
+    }
 
   const name = document.getElementById('name').value;
   // var name = 'test_name'
@@ -158,10 +167,55 @@ score_button.addEventListener('click', () => {
 
   refreshDisplay()
 
+  });
 
+start_new.addEventListener('click', () => {
+ // fetch something from server that replaces the current_question.round_start with now()
 
+  function areYouSure() {
+  confirm("Are you sure? This will clear all scores!");
+  }
+
+  function clear_score() {
+  // fetch('/reveal_score/') // gets /api/messages (GET is the default)
+  //   .then(result => result.json() // console.log(result) 
+  //     ).then(data => displayMessage(data) //console.log(data)
+  //     ).catch(error => console.log('There was an error', error));
+
+    fetch('/clear_score/', {
+          method: 'PUT',
+          body: bobcatStr,
+          headers: {
+          'Content-Type': 'application/json'
+          } 
+          }
+          )
+          // ).then(result => result.json())
+            // .then(data => wasitcorrect(data))
+            // .then(console.log('wasitcorrect has passed'))
+            // .then( (player_eval) => {
+            //   window.location.href = 
+            //   "/results.html?Page=data&name=" + nameParam + "&question=" 
+            //   + questionParam + "&guess=" + guessParam + "&player_eval=" + player_eval; }) //is there a way to get the res.send file from this? 
+
+    }
+
+  const name = document.getElementById('name').value;
+  // var name = 'test_name'
+  const mykey2 = { "name" : name }     
+  console.log("mykey2", mykey2)
+
+  const bobcatStr = JSON.stringify(mykey2);
+  console.log(bobcatStr);      
+
+  areYouSure();
+  clear_score();
 
 })
+
+
+
+
 
 
 

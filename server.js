@@ -71,12 +71,14 @@ app.put('/current_q_update/', async (req, res) => {
     // var guess_id_formatted23 = temp23_ids.id;
 
     client24.release();
+    var response1 = JSON.stringify({response :"Question updated"});
+    res.send(response1);
     } else {
         console.log('incorrect username');
         var response = ('incorrect username');
         // var response2 = JSON.object(response);
         // var incorrect = JSON.stringify(response2);
-        var response2 = JSON.stringify({incorrect :"wrong username"});
+        var response2 = JSON.stringify({response :"wrong username"});
         console.log('response2', response2);
         res.send(response2);
     }
@@ -239,6 +241,7 @@ app.put('/guess_update/', async (req, res) => {
     const client23 = await pool.connect();
     let sql23 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND question = $2';
     let params23 = [ name, ref_num ]
+
     const  temp23  = await client23.query(sql23, params23 ); 
     console.log('temp23', temp23.rows)
     //add error catch here for if more than one ID comes up (i.e. answered twice)
@@ -519,14 +522,25 @@ app.put('/reveal_score/', async (req, res) => {
         console.log(temp30[i].name) // find each of these players' cumulative scores and place each of these into recent_guesses
 
 
-
+        try {
+        // let sql33 = 'SELECT DATE_TRUNC($1, round_start) FROM current_question';
+        // let params33 = ['minute']
+        let sql33 = 'SELECT round_start_str FROM current_question'
+        const {rows: temp33} = await client25.query(sql33);
+        console.log('temp33', temp33);
+        var game_start_time = temp33[0].round_start_str;
+        console.log('game_start_time', game_start_time);
+        // var game_start_string = game_start_time.toString();
+        // console.log('game_start_string', game_start_string);
 
 
         let sql29 = 'SELECT name, sum(points) AS total_score FROM player_guesses WHERE created_at > $1 AND name = $2 GROUP BY name'   
         // ^^ this is where to start tomorrow - put this in the loop below to add to the recent_guesses table
         // 'LEFT JOIN recent_guesses ON recent_guesses.name = player_guesses.name'
         // 'UPDATE '
-        let params29 = [ '2020-20-08', temp30[i].name ]  //HERE
+        // let params29 = [ '2020-09-05 23:13:03', temp30[i].name ]  //HERE
+        let params29 = [ game_start_time, temp30[i].name ]  
+
         console.log('params29', params29)
         const {rows: temp29} = await client25.query(sql29, params29 );
         console.log('temp29', temp29) //cumulate scores of each player
@@ -537,16 +551,53 @@ app.put('/reveal_score/', async (req, res) => {
         let sql31 = 'UPDATE recent_guesses SET cumulative_score = $1 WHERE name = $2' // use inner join to combine subset of recent_guesses with player_guesses
         let params31 = [ temp29[0].total_score , temp30[i].name]
         const {rows: temp31} = await client25.query(sql31, params31)
+        } catch {
+            console.log('player has not yet won a point:',temp30[i].name);
+            let sql34 = 'UPDATE recent_guesses SET cumulative_score = $1 WHERE name = $2' // use inner join to combine subset of recent_guesses with player_guesses
+            let params34 = [ '0' , temp30[i].name]
+            const {rows: temp31} = await client25.query(sql34, params34)
 
+        }   
 
     };
     // for i in 
     client25.release();
 
-    res.send(cumulative_scores)
+    // res.send(cumulative_scores)
     }
 
     // console.log('reveal score code goes here');
+})
+
+app.put('/clear_score/', async (req, res) => {  
+// updates current_question.round_start_str
+// to create new start time
+
+    const name = req.body.name;
+    console.log('player question', name);
+
+    if (name === 'Natalie') {
+    const client25 = await pool.connect();
+
+    let sql26 = 'SELECT id FROM current_question'
+    const  {rows: temp26}  = await client25.query(sql26); 
+
+    let sql35 = 'UPDATE current_question SET round_start_str = $1 WHERE question_written = $2';
+    // let sql36 = 'SELECT NOW()' // convert this to GMT (greenwich mean time)
+    let sql36 = 'SELECT now()::timestamp' ; // set timezone setting postgres
+
+    const  {rows: temp36}  = await client25.query(sql36); 
+
+    let current_time = temp36[0].now;
+    console.log('current_time', current_time)
+    let params35 = [ current_time, 'Test']; 
+    console.log('params35', params35)
+    const  {rows: temp35}  = await client25.query(sql35, params35); 
+
+
+
+    }
+
 })
 
 

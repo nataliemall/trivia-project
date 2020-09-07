@@ -115,6 +115,7 @@ submit_button.addEventListener('click', () => {
 
 
     var player_eval = await fetch('/guess_update/', {
+      //puts guess into database 
       method: 'PUT',
       body: bobcatStr,
       headers: {
