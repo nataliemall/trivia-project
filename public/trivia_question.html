@@ -8,9 +8,41 @@
 
 
 .bigText{
-  font-size: 5em;
-  font-family:'Trebuchet MS', Helvetica, sans-serif;;
+  font-size: 3em;
+  font-family:verdana;
 }
+
+.normalText {
+  font-size: 25px;
+  font-family:verdana;
+}
+
+  hr {
+
+ font-size: 18px;
+ font-family:verdana;
+
+ }
+
+  label {
+
+ font-size: 15px;
+ font-family:verdana;
+
+ }
+
+  div {
+
+ font-size: 15px;
+ font-family:verdana;
+
+ }
+
+ table {
+ font-size: 15px;
+ font-family:verdana;
+
+ }
 </style>
 
 <html lang="en" dir="ltr">
@@ -29,7 +61,7 @@
 <!-- <form> -->
 
 
-<h2> Submit your best guess to the following trivia question: </h2>
+<div class = normalText> Submit your best guess to the following trivia question: <div>
 
 <div id = "form_body" style="
     padding: 20px;
@@ -98,7 +130,7 @@
 <br>
 <br>
 
-<div class="bigText" id = "evaluation">
+<div class="normalText" id = "evaluation">
     <!-- change font size here -->
     <!-- Your answer was...  -->
 </div>
@@ -108,8 +140,18 @@
 <IMG id="myImg">
 
 
+<form action="/trivia_question.html" method="GET">
+    <section class="submission">
+     <!--  <input type="submit" onclick="return confirm('Are you sure? (last chance to make edits!) ')" value="Submit" id = 'submit_button'/> -->
+     <!-- include above statement once the app goes leaves beta mode -->
+      <input type="submit" value="Refresh results page" id = 'refresh_results'>
+    </section>
+
+</form>
+
+
 <!-- ************** Cumulate results *************** -->
-<h4>Player Results from past question: <br> (Refresh when admin reveals scores)</h4>
+<p class = 'normalText'>Player Results from past question: <br> (Refresh when admin reveals scores)</p>
 
 
 <div id = "past_question">

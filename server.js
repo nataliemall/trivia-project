@@ -99,17 +99,91 @@ app.put('/table_update/', async (req, res) => {
     //select the current 
     const name = req.body.name;
     const question = req.body.mykey; //"${message}"
-    const answerA = req.body.answerA;
-    const answerB = req.body.answerB;
-    const answerC = req.body.answerC;
-    const answerD = req.body.answerD;
+    const answer1 = req.body.answerA;
+    const answer2 = req.body.answerB;
+    const answer3 = req.body.answerC;
+    const answer4 = req.body.answerD;
     const correct_answer = req.body.correctAnswer;
 
+
+
+    // scramble the answers: 
+
+    function shuffle(array) {
+          var currentIndex = array.length, temporaryValue, randomIndex;
+
+          // While there remain elements to shuffle...
+          while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = array[currentIndex];
+            array[currentIndex] = array[randomIndex];
+            array[randomIndex] = temporaryValue;
+          }
+
+          return array;
+        }
+
+    // Used like so
+    var arr = [answer1, answer2, answer3, answer4];
+    shuffle(arr);
+    console.log('shuffled array', arr);
+
+    answerA = arr[0];
+    answerB = arr[1];
+    answerC = arr[2];
+    answerD = arr[3]; 
+
+    //match scrambled with correct answer: 
+    switch (correct_answer) {
+        case "A":
+            // console.log('correct answer was A')
+            written_answer = answer1
+            break;
+        case "B":
+            // console.log('correct answer was B')
+            written_answer = answer2
+            break;
+        case "C":
+            // console.log('correct answer was C')
+            written_answer = answer3
+            break;
+        case "D":
+            // console.log('correct answer was D')
+            written_answer = answer4
+            break;
+        }
+
+    switch (written_answer) {
+        case answerA:
+            // console.log('correct answer is now moved to A')
+            answer_location = 'A'
+            break;
+        case answerB:
+            // console.log('correct answer is now moved to B')
+            answer_location = 'B'
+            break;
+        case answerC:
+            // console.log('correct answer is now moved to C')
+            answer_location = 'C'
+            break;
+        case answerD:
+            // console.log('correct answer is now moved to D')
+            answer_location = 'D'
+            break;
+
+    }
+
+
     console.log('message', question);
-    console.log('answers', name, answerA, answerB, answerC, answerD, correct_answer);
+    console.log('answers', name, answerA, answerB, answerC, answerD, answer_location);
 
     let sql = 'INSERT INTO trivia_questions (name, question, answera, answerb, answerc, answerd, correctAnswer) VALUES ($1, $2, $3, $4, $5, $6, $7)';
-    let params = [ name, question, answerA, answerB, answerC, answerD, correct_answer ];
+    let params = [ name, question, answerA, answerB, answerC, answerD, answer_location ];
     client.query(sql, params, function(err) {
     // make sure you handle errors from here as well,
     // including signaling `res` and `done`

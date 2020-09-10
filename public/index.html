@@ -6,11 +6,39 @@
 
 <style>
 
+  hr {
+
+ font-size: 18px;
+ font-family:verdana;
+
+ }
+
+  label {
+
+ font-size: 15px;
+ font-family:verdana;
+
+ }
+
+  div {
+
+ font-size: 15px;
+ font-family:verdana;
+
+ }
+
+/*font-family:verdana;*/
 
 .bigText{
-  font-size: 20em;
-  font-family: Impact;
+  font-size: 3em;
+  font-family:verdana;
 }
+
+.normalText {
+  font-size: 25px;
+  font-family:verdana;
+}
+
 </style>
 
 <html lang="en" dir="ltr">
@@ -23,15 +51,7 @@
   <body>
     <section id="overlay">
 
-<!--       <div class = "bigText"> 
-        <p>presenting</p>
-        <br>
-        <p>Cousin</p>
-      </div> -->
-      <br>
-      <!-- <hr>   -->
-      <!--#pandu how do I make a better break -->
-<!--       <img src="https://alexandrialivingmagazine.com/downloads/2484/download/Trivia%20Night%20Logo.jpg?cb=d8bcce6707e7d210ac1b382dd3895118&amp;w=500&amp;h= 500w" alt="Trivia Logo" id="logo"> -->
+<br>
 
       <img src="welcome.jpg">
       <!-- <hr> -->
@@ -53,18 +73,27 @@
       <label for = "name">What's your name?</label>
       <input type = "text" required name = "name" id = "name" maxlength= "20"> <!-- pattern = "[a-zA-Z]+" --> 
     </section>
+
+    <br>
+    <br>
+
     <section class = "question1">
-    <h2>Enter your trivia question here:</h2>  
+    <div class = "normalText">Enter your trivia question here:</div>  
 
     <!-- <label for = "question_submission"> Question:</label> -->
     <textarea id="q1" required name="q1" rows="3" cols="40" maxlength="200"></textarea>
 <!--     <input type = "text" name = "trivia_question" value = "example: Who is your favorite cousin?" id = "question_submission"> -->
 
+<br>
+<br>
+<div class = "normalText"> Enter your solutions here:</div>
+<div> (don't worry about order - answers will automatically be scrambled):</div> 
+
     <hr>
     <label for = "answerA">Answer A:</label>
     <input type = "text" required name = "anteater" id = "answerA" maxlength = "40">
 
-    <hr>    <!-- #pandu how do I make line breaks-->
+    <hr>    
    
    <hr>
     <label for = "answerB">Answer B:</label>
