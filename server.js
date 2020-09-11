@@ -59,7 +59,16 @@ app.put('/current_q_update/', async (req, res) => {
 
 
     if (name === 'Natalie') {
+
     const client24 = await pool.connect();
+
+
+    // add update of reveal_score here
+    let sql38 = 'UPDATE current_question SET reveal_scores = $1'
+    let params38 = ['false'];
+    const  {rows: temp38}  = await client24.query(sql38, params38); 
+
+
     let sql24 = 'UPDATE current_question SET id = $1';
     let params24 = [ question_id  ]
     const  temp23  = await client24.query(sql24, params24 ); 
@@ -245,6 +254,7 @@ app.get('/retrieve_list/', async (req, res) => {
 
 
 app.get('/retrieve_question/', async (req, res) => {
+// retrieve current question for player to guess
     console.log('made it inside "retrieve quesion" ' )
   try{
 
@@ -476,12 +486,11 @@ app.put('/guess_update/', async (req, res) => {
     } 
 
     }
-
 });
 
 
 app.get('/player_scores/', async (req, res) => {  
-
+// updates players' scores for current question
   
   try {
 
@@ -552,6 +561,11 @@ app.put('/reveal_score/', async (req, res) => {
 
     if (name === 'Natalie') {
     const client25 = await pool.connect();
+
+    let sql37 = 'UPDATE current_question SET reveal_scores = $1'
+    let params37 = ['true'];
+    const  {rows: temp37}  = await client25.query(sql37, params37); 
+
 
     let sql26 = 'SELECT id FROM current_question'
     const  {rows: temp26}  = await client25.query(sql26); 
@@ -643,6 +657,7 @@ app.put('/reveal_score/', async (req, res) => {
     // console.log('reveal score code goes here');
 })
 
+
 app.put('/clear_score/', async (req, res) => {  
 // updates current_question.round_start_str
 // to create new start time
@@ -671,11 +686,6 @@ app.put('/clear_score/', async (req, res) => {
 
 
     }
-
-})
-
-
-app.get('/closed_submission/', async (req, res) =>{
 })
 
 
@@ -684,11 +694,20 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 
   try{
 
+    const q_client = await pool.connect();
+    let sql38 = 'SELECT reveal_scores FROM current_question WHERE question_written = $1'
+    let params38 = ['Test'];
+    const { rows: temp38 } = await q_client.query(sql38, params38)
+
+    reveal_boolean = temp38[0].reveal_scores;
+    console.log('reveal_boolean:', reveal_boolean);
+
+    if (reveal_boolean) {
+
     //reaches into current_question table to retrieve revealed_question
     var q_title = 'Test';
     let sql_q_id = 'SELECT (revealed_question) FROM current_question WHERE question_written = $1';
     let q_params = [q_title];
-    const q_client = await pool.connect();
     const { rows: q_name } = await q_client.query(sql_q_id, q_params)
     q_client.release();    
     var q_unbracketed = q_name[0];
@@ -696,23 +715,6 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 
     var revealed_id_var = q_unbracketed.revealed_question;
     console.log('revealed_id_var', revealed_id_var);
-
-
-    //reaches into current_question table to retrieve current question
-    // var q_title = 'Test';
-    // let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
-    // let q_params = [q_title];
-    // const q_client = await pool.connect();
-    // const { rows: q_name } = await q_client.query(sql_q_id, q_params)
-    // q_client.release();    
-    // var q_unbracketed = q_name[0];
-    // console.log('q_unbracketed', q_unbracketed);
-
-    // var question_id_var = q_unbracketed.id;
-    // console.log('question_id_var', question_id_var);
-
-
-    // var question_id = 8;  //hard-coded way  where the question is chosen 
 
     let sql = 'SELECT id, question, answera, answerb, answerc, answerd, correctanswer FROM trivia_questions WHERE id = $1';
 
@@ -735,10 +737,16 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
     // var combined_sender = Object.assign(temp25);
     var combined_sender = JSON.stringify({id: result.rows[0].id});
 
-    var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
+    var combined_sender2 = ({reveal_score: 'yes', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
     console.log('combined', combined_sender2); 
     res.send(combined_sender2);
-    
+    } else {
+        // send an alternate version of combines_sender2 that says not to send data over 
+        var combined_sender2 = ({reveal_score: 'no'});
+        console.log('combined', combined_sender2); 
+        res.send(combined_sender2)
+
+    }
   } catch (err) {
         console.error(err);
         res.send("Error " + err);
@@ -748,28 +756,28 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 })
 
 
-app.get('/check_current_question/', async (req, res) => {
-    //checks that question for submission is the up-to-date one, otherwise refreshes page- OBsolete??
-    console.log('made it inside "check_current_question" ' )
-  try{
+// app.get('/check_current_question/', async (req, res) => {
+// //checks that question for submission is the up-to-date one, otherwise refreshes page- OBsolete??
+//     console.log('made it inside "check_current_question" ' )
+//   try{
 
-    //reaches into current_question table to retrieve current question
-    var q_title = 'Test';
-    let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
-    let q_params = [q_title];
-    const q_client = await pool.connect();
-    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
-    q_client.release();    
-    var q_unbracketed = q_name[0];
-    console.log('q_unbracketed', q_unbracketed);
+//     //reaches into current_question table to retrieve current question
+//     var q_title = 'Test';
+//     let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
+//     let q_params = [q_title];
+//     const q_client = await pool.connect();
+//     const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+//     q_client.release();    
+//     var q_unbracketed = q_name[0];
+//     console.log('q_unbracketed', q_unbracketed);
 
-    var question_id_var = q_unbracketed.id;
-    console.log('question_id_var', question_id_var);
+//     var question_id_var = q_unbracketed.id;
+//     console.log('question_id_var', question_id_var);
 
-    } catch (err) {
-        console.log(err)
-    }
-    } );
+//     } catch (err) {
+//         console.log(err)
+//     }
+//     } );
 
 
 //port listening, which happens once at the end of the code 

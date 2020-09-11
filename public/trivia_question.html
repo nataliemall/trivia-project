@@ -151,15 +151,17 @@
 
 
 <!-- ************** Cumulate results *************** -->
-<p class = 'normalText'>Player Results from past question: <br> (Refresh when admin reveals scores)</p>
+<p id = recentQuestionResults class = 'normalText'>
+  <!-- Player Results from past question: <br> (Refresh when admin reveals scores) -->
+</p>
 
 
 <div id = "past_question">
-    Question:
+    
 </div>
 <br>
 <div id = "past_answers">
-  answers:
+  
 </div>
 
 <table>
@@ -171,8 +173,10 @@
 
 <table id = "scoreTable">
   <tr>
-    <th>Name</th>
-    <th>Guess</th>
+    <th><!-- name --></th> 
+    <!-- name -->
+    <th><!-- guess --></th>
+    <!-- guess -->
     <!-- <th>Total Score</th> -->
   </tr>
 
@@ -184,9 +188,9 @@
 
 <table id = "cumulativeTable">
   <tr>
-    <th>Name</th>
+    <th></th>
     <!-- <th>Guess</th> -->
-    <th>Cumulative Score</th>
+    <th></th>
   </tr>
 
 </table>

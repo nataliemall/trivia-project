@@ -264,61 +264,96 @@ submit_button.addEventListener('click', () => {
 
 console.log('hello from the score_page')
 
+const displayTitle = document.getElementById('recentQuestionResults')
 const displayPastQuestion = document.getElementById('past_question');
 const answers = document.getElementById('past_answers');
+var reveal_score = 'yes';
 
+async function displayQuestion(message1) { 
 
-function displayQuestion(message1) {   
+  var reveal_score = message1.reveal_score
+  console.log('displayQuestion reveal_score:', reveal_score)
+  displayTitle.innerHTML = '' //blank when question not yet revealed
 
-  console.log('message1', message1);
-  // console.log(message1[1])
-  
-  displayPastQuestion.innerHTML = message1.question;
-  var info = Object.keys(message1).length;
+  if (reveal_score == 'yes') {
 
-  var correctanswer = message1.correctanswer
+    console.log('message1', message1);
+    // console.log(message1[1])
+    
+    displayTitle.innerHTML = 'Player Results from past question:'
+    displayPastQuestion.innerHTML = message1.question;
+    var info = Object.keys(message1).length;
 
-  function generateTableHead(table) {
-    let thead = table.createTHead();
-    let row = thead.insertRow();
-    for (let key of data) {
-      let th = document.createElement("th");
-      let text = document.createTextNode(key);
-      th.appendChild(text);
-      row.appendChild(th);
+    var correctanswer = message1.correctanswer
+
+    function generateTableHead(table) {
+      let thead = table.createTHead();
+      let row = thead.insertRow();
+        // let th = document.createElement("th");
+        // let text = document.createTextNode(key);
+        // th.appendChild(text);
+        // row.appendChild(th);
+
+      for (let key of data) {
+        let th = document.createElement("th");
+        let text = document.createTextNode(key);
+        th.appendChild(text);
+        row.appendChild(th);
+      }
     }
+
+    let table = document.querySelector("table");
+    let data = ['Correct Answer:', correctanswer];
+    generateTableHead(table);
+
+    answers.innerHTML =  ( 'A) ' + message1.answera + '<br>' );
+    answers.innerHTML += ( 'B) ' + message1.answerb + '<br>' );
+    answers.innerHTML += ( 'C) ' + message1.answerc + '<br>' );
+    answers.innerHTML += ( 'D) ' + message1.answerd + '<br>' );
+  } else {
+      console.log('score not to be revealed at this time')
   }
 
-  let table = document.querySelector("table");
-  let data = ['Correct Answer:', correctanswer];
-  generateTableHead(table);
-
-  answers.innerHTML =  ( 'A) ' + message1.answera + '<br>' );
-  answers.innerHTML += ( 'B) ' + message1.answerb + '<br>' );
-  answers.innerHTML += ( 'C) ' + message1.answerc + '<br>' );
-  answers.innerHTML += ( 'D) ' + message1.answerd + '<br>' );
-
   }
 
 
-function refreshDisplay() {
+//table head creator 
+function generateTableHead(table, data) {
+  let thead = table.createTHead();
+  let row = thead.insertRow();
+    // let th = document.createElement("th");
+    // let text = document.createTextNode(key);
+    // th.appendChild(text);
+    // row.appendChild(th);
+    
+  for (let key of data) {
+    let th = document.createElement("th");
+    let text = document.createTextNode(key);
+    th.appendChild(text);
+    row.appendChild(th);
+  }
+}
+
+async function refreshDisplay() {
   fetch('/retrieve_revealed_question/') // gets /api/messages (GET is the default)
     .then(result => result.json() // console.log(result) 
       )
-    .then(data => displayQuestion(data)
+    .then(data => displayQuestion(data) //displays past question
       )
     .catch(error => console.log('There was an error', error))
 }
 
 
-var table = document.getElementById("scoreTable");
-console.log('table', table);
 
 
-
-function displayMessage(scores) {   // displays players' most recent guesses
+function displayMessage(scores) {   // displays players' most recent guesses 
   // console.log('scores', scores);
   // console.log(scores[0])
+  var table = document.getElementById("scoreTable");
+  console.log('table', table);
+
+  let data = ['Name:', 'Guess:'];
+  generateTableHead(table, data);
 
   var i;
   for (i = 0; i < scores.length; i++) {
@@ -358,8 +393,13 @@ function displayTotals(cumulative_scores) {   //still needs to be updated
 
   var lengthm = cumulative_scores.length;
   var cumulativeTable = document.getElementById("cumulativeTable");
+
+  let data = ['Name:', 'Cumulative Score:'];
+  generateTableHead(cumulativeTable, data);
+
+
   var i;
-  console.log('table2', table);
+  console.log('table2', cumulativeTable);
   for (i = 0; i < cumulative_scores.length; i++) {
     // text += cars[i] + "<br>";
     // var row = table.insertRow(i+1);
@@ -397,24 +437,37 @@ function displayTotals(cumulative_scores) {   //still needs to be updated
 }
 
 function display_cumulative_scores() {
+      if (reveal_score == 'yes') { //this should have been switched to no - pandu why
   fetch('/cumulative_scores/')
   .then(console.log('already fetched cumulative_scores'))
+  .then(console.log('reveal_score display_cumulative_scores', reveal_score))
   .then(result => result.json()
     )
   .then(console.log('result achieved'))
   .then(data => displayTotals(data)
     )
   .catch(error => console.log('Error in displaying cumulative_scores', error))
+    }
 };
 
-refreshDisplay();
 
 function display_updates() {
-  display_results()
-  .then(display_cumulative_scores())
+  refreshDisplay() // retrieves and displaysthe revealed past question
+  .then(display_results()  //retrieves and displayes and most recent guesses 
+  ).then(display_cumulative_scores() //retrieves and displays past scores
+    )
 }
 
-display_updates();
 
+  // refreshDisplay()
+  
+  display_updates()
+  
+  //retrieves revealed question
+
+// console.log('reveal_score', reveal_score);
+// if (reveal_score == 'yes') {
+// display_updates()
+  
 
 
