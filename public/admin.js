@@ -157,9 +157,35 @@ start_new.addEventListener('click', () => {
 
 })
 
+add_players.addEventListener('click', () => {
 
+  const name_to_add = document.getElementById('name_to_add').value;
+  const name2addkey = { "name_to_add" : name_to_add, "add_or_remove" : 'add' }  
+  const bobcatStr = JSON.stringify(name2addkey);
+ 
+  fetch('/add_player/', {
+            method: 'PUT',
+            body: bobcatStr,
+            headers: {
+            'Content-Type': 'application/json'
+              } 
+  })
+})
 
+remove_players.addEventListener('click', () => {
 
+  const name_to_add = document.getElementById('name_to_remove').value;
+  const name2addkey = { "name_to_add" : name_to_add, "add_or_remove" : 'remove' }  
+  const bobcatStr = JSON.stringify(name2addkey);
+ 
+  fetch('/add_player/', {
+            method: 'PUT',
+            body: bobcatStr,
+            headers: {
+            'Content-Type': 'application/json'
+              } 
+  })
+})
 
 
 

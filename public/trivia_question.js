@@ -314,6 +314,7 @@ async function displayQuestion(message1) {
       console.log('score not to be revealed at this time')
   }
 
+    return reveal_score;
   }
 
 
@@ -335,7 +336,7 @@ function generateTableHead(table, data) {
 }
 
 async function refreshDisplay() {
-  fetch('/retrieve_revealed_question/') // gets /api/messages (GET is the default)
+  return fetch('/retrieve_revealed_question/') // gets /api/messages (GET is the default)
     .then(result => result.json() // console.log(result) 
       )
     .then(data => displayQuestion(data) //displays past question
@@ -354,7 +355,7 @@ function displayMessage(scores) {   // displays players' most recent guesses
 
   let data = ['Name:', 'Guess:'];
   generateTableHead(table, data);
-
+  console.log('scores:', scores);
   var i;
   for (i = 0; i < scores.length; i++) {
     // text += cars[i] + "<br>";
@@ -367,17 +368,31 @@ function displayMessage(scores) {   // displays players' most recent guesses
     cell2.innerHTML = scores[i].guess;
 
   }
+  var testReturn = 'Test return_thing'
+  return reveal_score
 
 }
 
-async function display_results() {
+function foo(thing) {
+  var foodie = 'foodie1'
+  console.log('FOODIE')
+  return foodie
+}
 
-    fetch('/player_scores/')
-    .then(result => result.json() // console.log(result) 
-      )
+async function display_results(reveal_score) {
+    if (reveal_score == 'yes') {
+
+    fetch('/player_scores/')  //how to put a return here without breaking - Pandu
+    .then(result => {
+      result.json() // console.log(result) 
+      console.log('result:', result)
+      })
     .then(data => displayMessage(data)
       )
     .catch(error => console.log('There was an error', error));
+    } else {
+      console.log('not set to reveal the score')
+    }
 
 };
 
@@ -436,7 +451,7 @@ function displayTotals(cumulative_scores) {   //still needs to be updated
 
 }
 
-function display_cumulative_scores() {
+function display_cumulative_scores(reveal_score) {
       if (reveal_score == 'yes') { //this should have been switched to no - pandu why
   fetch('/cumulative_scores/')
   .then(console.log('already fetched cumulative_scores'))
@@ -453,13 +468,14 @@ function display_cumulative_scores() {
 
 function display_updates() {
   refreshDisplay() // retrieves and displaysthe revealed past question
-  .then(display_results()  //retrieves and displayes and most recent guesses 
-  ).then(display_cumulative_scores() //retrieves and displays past scores
-    )
+  .then((reveal_score) => {
+    console.log('reveal_score', reveal_score); 
+    display_results(reveal_score)}  //retrieves and displayes and most recent guesses 
+  ).then((test) => {display_cumulative_scores(test) //retrieves and displays past scores
+    console.log('test thing from display_cumulative_scores', test)
+  })
 }
 
-
-  // refreshDisplay()
   
   display_updates()
   

@@ -756,6 +756,43 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 })
 
 
+app.put('/add_player/', async (req, res) => {
+// adds player to the cumulative score database
+    let nametoadd = req.body.name_to_add;
+    console.log('nametoadd:', nametoadd)
+    let add_or_remove = req.body.add_or_remove;
+    console.log('nametoadd', nametoadd);
+    console.log('add_or_remove', add_or_remove);
+
+
+    let nametoadd2 = 'Test4'
+    let sql39;
+    let client39; 
+    try {
+        client39 = await pool.connect();
+        let add_or_remove2 = JSON.stringify(add_or_remove.toString());  // problem here w converting to string
+        console.log('add_or_remove2', add_or_remove2);
+        if (add_or_remove == 'add') {   
+            console.log('Inside if statement')   
+            sql39 = 'INSERT INTO recent_guesses(name) VALUES ($1)'
+        } else if (add_or_remove == 'remove') {
+            sql39 = 'DELETE FROM recent_guesses WHERE name = $1'
+        }
+    } catch {
+        console.log('error1')
+    }
+
+    console.log('sql39', sql39)
+    try {
+        let params39 = [ nametoadd ]
+        const  {rows: temp39}  = await client39.query(sql39, params39); 
+    } catch (err) {
+        console.log('error2', err)
+    }
+
+
+})
+
 // app.get('/check_current_question/', async (req, res) => {
 // //checks that question for submission is the up-to-date one, otherwise refreshes page- OBsolete??
 //     console.log('made it inside "check_current_question" ' )
