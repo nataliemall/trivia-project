@@ -321,6 +321,9 @@ async function displayQuestion(message1) {
 //table head creator 
 function generateTableHead(table, data) {
   let thead = table.createTHead();
+  // thead.style.color = 'dark blue';
+  thead.style.textAlign = 'left';
+
   let row = thead.insertRow();
     // let th = document.createElement("th");
     // let text = document.createTextNode(key);
@@ -453,11 +456,14 @@ function displayTotals(cumulative_scores) {   //still needs to be updated
       cell2.innerHTML = cumulative_scores[i].cumulative_score;
 
       if (cumulative_scores[i].cumulative_score == max_cumulative_scores) {
+        if (max_cumulative_scores !== 0){
+
         console.log('max score here')
         cell2.style.color="green"
         cell1.style.color="green"
         cell1.style.fontWeight = "bold"
         cell2.style.fontWeight = "bold"
+}
 
       }
 
