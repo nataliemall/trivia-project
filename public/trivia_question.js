@@ -347,7 +347,7 @@ async function refreshDisplay() {
 
 
 
-function displayMessage(scores) {   // displays players' most recent guesses 
+function displayMessage(scores, reveal_score) {   // displays players' most recent guesses 
   // console.log('scores', scores);
   // console.log(scores[0])
   var table = document.getElementById("scoreTable");
@@ -380,19 +380,19 @@ function foo(thing) {
 }
 
 async function display_results(reveal_score) {
-    if (reveal_score == 'yes') {
+    // if (reveal_score == 'yes') {
 
-    fetch('/player_scores/')  //how to put a return here without breaking - Pandu
-    .then(result => {
+    return fetch('/player_scores/')  //how to put a return here without breaking - Pandu
+    .then(result => 
       result.json() // console.log(result) 
-      console.log('result:', result)
-      })
-    .then(data => displayMessage(data)
+      // console.log('result:', result)
+      )
+    .then(data => displayMessage(data, reveal_score)
       )
     .catch(error => console.log('There was an error', error));
-    } else {
-      console.log('not set to reveal the score')
-    }
+    // } else {
+      // console.log('not set to reveal the score')
+    // }
 
 };
 
@@ -462,6 +462,9 @@ function display_cumulative_scores(reveal_score) {
   .then(data => displayTotals(data)
     )
   .catch(error => console.log('Error in displaying cumulative_scores', error))
+    } else { 
+      console.log('something else happened - no reveal_score == yes')
+      console.log('reveal_score inside display_cumulative_scores' + reveal_score)
     }
 };
 
@@ -470,9 +473,9 @@ function display_updates() {
   refreshDisplay() // retrieves and displaysthe revealed past question
   .then((reveal_score) => {
     console.log('reveal_score', reveal_score); 
-    display_results(reveal_score)}  //retrieves and displayes and most recent guesses 
-  ).then((test) => {display_cumulative_scores(test) //retrieves and displays past scores
-    console.log('test thing from display_cumulative_scores', test)
+    return display_results(reveal_score)}  //retrieves and displayes and most recent guesses 
+  ).then((reveal_score) => {display_cumulative_scores(reveal_score) //retrieves and displays past scores
+    console.log('test thing from display_cumulative_scores', reveal_score)
   })
 }
 
