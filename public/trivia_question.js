@@ -350,8 +350,11 @@ async function refreshDisplay() {
 function displayMessage(scores, reveal_score) {   // displays players' most recent guesses 
   // console.log('scores', scores);
   // console.log(scores[0])
+
+  console.log('reveal_score from displayMessage', reveal_score);
   var table = document.getElementById("scoreTable");
   console.log('table', table);
+
 
   let data = ['Name:', 'Guess:'];
   generateTableHead(table, data);
@@ -380,7 +383,7 @@ function foo(thing) {
 }
 
 async function display_results(reveal_score) {
-    // if (reveal_score == 'yes') {
+    if (reveal_score == 'yes') {
 
     return fetch('/player_scores/')  //how to put a return here without breaking - Pandu
     .then(result => 
@@ -390,9 +393,10 @@ async function display_results(reveal_score) {
     .then(data => displayMessage(data, reveal_score)
       )
     .catch(error => console.log('There was an error', error));
-    // } else {
-      // console.log('not set to reveal the score')
-    // }
+    } else {
+      console.log('not set to reveal the score')
+      return reveal_score
+    }
 
 };
 
@@ -404,6 +408,22 @@ function displayTotals(cumulative_scores) {   //still needs to be updated
   console.log('cumulative_scores', cumulative_scores);
 
   console.log('cumulative as object', cumulative_scores[0])
+
+  let score_vals = [0,0];
+  for (i = 0; i < cumulative_scores.length; i++) {
+    score_vals.push(cumulative_scores[i].cumulative_score);
+  }
+
+
+  // var newArr = score_vals.slice(1, 15);  //fix - currently hardcoded length
+
+  console.log('score list', score_vals);
+  // console.log('newArr', newArr)
+  // score_vals2 = score_vals.value
+  // var max_cumulative_scores = Math.max.apply(null, [2,5,16,1]);
+  var max_cumulative_scores = Math.max.apply(null, score_vals);  //this works now
+
+  console.log('max:', max_cumulative_scores);
 
 
   var lengthm = cumulative_scores.length;
@@ -432,6 +452,14 @@ function displayTotals(cumulative_scores) {   //still needs to be updated
       var cell2 = row.insertCell(1)
       cell2.innerHTML = cumulative_scores[i].cumulative_score;
 
+      if (cumulative_scores[i].cumulative_score == max_cumulative_scores) {
+        console.log('max score here')
+        cell2.style.color="green"
+        cell1.style.color="green"
+        cell1.style.fontWeight = "bold"
+        cell2.style.fontWeight = "bold"
+
+      }
 
       // var j; 
       // var displayed_names = cumulativeTable.rows[1].cells.item(0).innerHTML;
