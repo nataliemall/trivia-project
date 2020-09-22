@@ -36,26 +36,12 @@ submit_button.addEventListener('click', () => {
     console.log(mykey2)
 
     const bobcatStr = JSON.stringify(mykey2);
-    console.log(bobcatStr);
-    // var jsonString = JSON.stringify(jsonConst)
-    // console.log(jsonConst) // does "mykey" need quotes around it?
-    // console.log(jsonString)
-
-    // const jsonConst = '{"mykey": "bigcat2"}';
-    // console.log(jsonstring2)
-    // const jsonConst2 = JSON.stringify(jsonConst),
 
     fetch('/table_update/', {
       method: 'PUT',
-      // body: JSON.stringify(jsonConst),
-      // body: '{"mykey": "bigcat2"}',
       body: bobcatStr,
       headers: {
-      // 'Accept': 'application/json',
       'Content-Type': 'application/json'
-      // 'Content-Type': 'text/plain'
-
-      // 'Content-Type': 'application/x-www-form-urlencoded',
       } 
       }).then(() => {
       // TODO something

@@ -1,9 +1,10 @@
 //trivia-crowd
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;  //connect via port 
 
 const express = require('express');
 const app = express();
+
 //database stuff: 
 const { Pool } = require('pg');
 const pool = new Pool({
@@ -13,19 +14,14 @@ const pool = new Pool({
   }
 });
 
-//settings - adjust for player entry periods: 
-var question_answer_mode = 1; 
-var reveal_mode = 0; 
 
 app.use(express.json()) // for parsing application/json
+
+app.use(express.static('public'));
 
 let router = require('express').Router();
 let bodyParser = require('body-parser');
 router.use(bodyParser.json());
-
-// const PORT = process.env.PORT || 4002;
-
-app.use(express.static('public'));
 
 
 app.get('/db', async (req, res) => {     
@@ -57,36 +53,24 @@ app.put('/current_q_update/', async (req, res) => {
     // console.log('name', question);
     console.log('player question', name, question_id);
 
-
     if (name === 'Natalie') {
 
-    const client24 = await pool.connect();
+        const client24 = await pool.connect();
 
+        // add update of reveal_score here
+        let sql38 = 'UPDATE current_question SET reveal_scores = $1'
+        let params38 = ['false'];
+        const  {rows: temp38}  = await client24.query(sql38, params38); 
 
-    // add update of reveal_score here
-    let sql38 = 'UPDATE current_question SET reveal_scores = $1'
-    let params38 = ['false'];
-    const  {rows: temp38}  = await client24.query(sql38, params38); 
+        let sql24 = 'UPDATE current_question SET id = $1';
+        let params24 = [ question_id  ]
+        const  temp23  = await client24.query(sql24, params24 ); 
 
-
-    let sql24 = 'UPDATE current_question SET id = $1';
-    let params24 = [ question_id  ]
-    const  temp23  = await client24.query(sql24, params24 ); 
-    // console.log('temp24', temp24.rows)
-    // //add error catch here for if more than one ID comes up (i.e. answered twice)
-    
-    // var temp24_ids = temp24.rows[0];
-    // console.log('temp24_ids', temp24_ids);
-    // var guess_id_formatted23 = temp23_ids.id;
-
-    client24.release();
-    var response1 = JSON.stringify({response :"Question updated"});
-    res.send(response1);
+        client24.release();
+        var response1 = JSON.stringify({response :"Question updated"});
+        res.send(response1);
     } else {
         console.log('incorrect username');
-        var response = ('incorrect username');
-        // var response2 = JSON.object(response);
-        // var incorrect = JSON.stringify(response2);
         var response2 = JSON.stringify({response :"wrong username"});
         console.log('response2', response2);
         res.send(response2);
@@ -114,16 +98,12 @@ app.put('/table_update/', async (req, res) => {
     const answer4 = req.body.answerD;
     const correct_answer = req.body.correctAnswer;
 
-
-
     // scramble the answers: 
-
     function shuffle(array) {
-          var currentIndex = array.length, temporaryValue, randomIndex;
+        var currentIndex = array.length, temporaryValue, randomIndex;
 
-          // While there remain elements to shuffle...
-          while (0 !== currentIndex) {
-
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
             // Pick a remaining element...
             randomIndex = Math.floor(Math.random() * currentIndex);
             currentIndex -= 1;
@@ -132,12 +112,10 @@ app.put('/table_update/', async (req, res) => {
             temporaryValue = array[currentIndex];
             array[currentIndex] = array[randomIndex];
             array[randomIndex] = temporaryValue;
-          }
-
-          return array;
+            }
+        return array;
         }
 
-    // Used like so
     var arr = [answer1, answer2, answer3, answer4];
     shuffle(arr);
     console.log('shuffled array', arr);
@@ -209,21 +187,11 @@ app.put('/table_update/', async (req, res) => {
 app.get('/retrieve_list/', async (req, res) => {
 // retrieves list of trivia questions for admin selection
 
-    var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 20';
-    // var id_list = 'SELECT '
+    var sql_q_list = 'SELECT * FROM trivia_questions ORDER BY id DESC LIMIT 35';
     const list_client = await pool.connect();
     const { rows: q_list } = await list_client.query(sql_q_list);
-
-
     list_client.release();   
 
-    console.log('q_list', q_list[0]);
-
-    var q_list_qs = q_list[0].question;
-    console.log(q_list_qs)
-    console.log('length', q_list.length);
-
-    
     var i;
     var complete_list = [];
     var id_list = [];
@@ -239,16 +207,11 @@ app.get('/retrieve_list/', async (req, res) => {
         q_object[(id_list[n])] = complete_list[n];
     }
 
-    var test2 = JSON.stringify(q_object);
-
-    console.log('test2', test2)
-
-    console.log('object_list', q_object)
-    console.log('complete_list', complete_list, id_list)
-
-    var question_list = 'question_list_placeholder'
-    var question_obj = Object.assign(test2);
     res.send(q_object);
+
+    // var test2 = JSON.stringify(q_object);
+    // var question_list = 'question_list_placeholder'
+    // var question_obj = Object.assign(test2);
 
     });
 
@@ -272,28 +235,13 @@ app.get('/retrieve_question/', async (req, res) => {
     console.log('question_id_var', question_id_var);
 
 
-    // var question_id = 8;  //hard-coded way  where the question is chosen 
-
-    let sql = 'SELECT id, question, answera, answerb, answerc, answerd FROM  trivia_questions WHERE id = $1';
-
-    // let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
+    let sql = 'SELECT id, question, answera, answerb, answerc, answerd FROM trivia_questions WHERE id = $1';
     let params = [question_id_var];
 
     const client = await pool.connect();
     const result = await client.query(sql, params);
-    // const temp123 = await client.query(sql, params)
-    // const name = temp123.rows;
-    console.log('result', result)
-    // return 
+  
     client.release();
-
-    var name5_unbracketed = result.rows[0].id; //question id
-    var temp25 = JSON.stringify({id: name5_unbracketed})
-
-    console.log('temp25', temp25);
-    // return
-    // var combined_sender = Object.assign(temp25);
-    var combined_sender = JSON.stringify({id: result.rows[0].id});
 
     var combined_sender2 = ({id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd })
     console.log('combined', combined_sender2); 
@@ -356,10 +304,7 @@ app.put('/guess_update/', async (req, res) => {
     var orderPromise = check_submission()
 
     console.log('orderPromise', orderPromise)
-    // console.log('guess_idTEST', guess_id_formatted23 )
 
-    // original_submission = 2
-    console.log('refresh test');
     if (temp23_ids) { //if this is an emply array, it means there hasn't been a previous answer submission
 
         var original_submission = 0;
@@ -431,18 +376,7 @@ app.put('/guess_update/', async (req, res) => {
         let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
         const  temp  = await client22.query(sql14, params ); //this was where it went wonky - July 31 2020
 
-        console.log('temp', temp.rows)
-    //add error catch here for if more than one ID comes up (i.e. answered twice)
-        var temp_ids = temp.rows[0];
-        console.log('temp_ids', temp_ids)
-        var guess_id_formatted = temp_ids.id;
- 
         client22.release();
-
-
-        console.log('guess_id_formatted', guess_id_formatted); //send this along to the 
-    //send guess_id along to the front end - then use this to extract the correct eval
-
 
         const client11 = await pool.connect();
         let sql11 = 'SELECT (correctanswer) FROM trivia_questions WHERE id = $1';
@@ -455,6 +389,7 @@ app.put('/guess_update/', async (req, res) => {
         var correct_answer = answer_key.correctanswer
         // client.release(); //changed from 'release' to 'end'  //this was a type release statement 
         client11.release()
+
         if (correct_answer == guess) {
           console.log('answer was correct! direct to results page')
           const client12 = await pool.connect();
@@ -529,28 +464,6 @@ app.get('/player_scores/', async (req, res) => {
 })
 
 
-app.get('/cumulative_scores/', async (req, res) => {  
-//sends the cumulative scores to score_page.js
-
-    try {
-
-        console.log('made it to line 443');
-        const client32 = await pool.connect();
-        let sql32 = 'SELECT name, cumulative_score FROM recent_guesses'
-        const {rows: name32} = await client32.query(sql32);
-        console.log('cumulative scores', name32);
-
-        cumulative_scores = JSON.stringify(name32)
-
-        res.send(cumulative_scores);
-        client32.release();
-    } catch (err) {
-        console.error(err);
-        res.send("Error on cumulative_scores side" + err);
-    }
-})
-
-
 app.put('/reveal_score/', async (req, res) => {  
 // updates revealed_question column of current_question data table 
 // to reveal score of new question
@@ -565,7 +478,6 @@ app.put('/reveal_score/', async (req, res) => {
     let sql37 = 'UPDATE current_question SET reveal_scores = $1'
     let params37 = ['true'];
     const  {rows: temp37}  = await client25.query(sql37, params37); 
-
 
     let sql26 = 'SELECT id FROM current_question'
     const  {rows: temp26}  = await client25.query(sql26); 
@@ -583,62 +495,41 @@ app.put('/reveal_score/', async (req, res) => {
     const {rows: temp28} = await client25.query(sql28, params25 );
     console.log('temp28', temp28);
 
-    // let sql29 = 'SELECT name, sum(points) AS total_score FROM player_guesses WHERE created_at > $1 AND name = $2 GROUP BY name'   
-    // // ^^ this is where to start tomorrow - put this in the loop below to add to the recent_guesses table
-    // // 'LEFT JOIN recent_guesses ON recent_guesses.name = player_guesses.name'
-    // // 'UPDATE '
-    // let params29 = [ '2020-08-08', 'Alice' ]
-    // const {rows: temp29} = await client25.query(sql29, params29 );
-    // console.log('temp29', temp29) //cumulate scores of each player
-
-    // select names of everyone who has played this round (or since a certain time)
+    // select names of everyone in recent_guesses 
     // select totals for each of those players 
     // update recent_guesses to show the cumulative score 
-
-    // var cumulative_scores = temp29[0] // use loop to retrieve every value
-    // console.log('cumulative_scores', cumulative_scores )
-    //insert cumulative scores into the recent_guesses data table
-
 
     let sql30 = 'SELECT name FROM recent_guesses'
     const {rows: temp30} = await client25.query(sql30)
     console.log('names of participants:', temp30)
 
-
     var i; 
     for (i = 0; i < temp30.length; i++) {
         console.log(temp30[i].name) // find each of these players' cumulative scores and place each of these into recent_guesses
 
-
         try {
-        // let sql33 = 'SELECT DATE_TRUNC($1, round_start) FROM current_question';
-        // let params33 = ['minute']
-        let sql33 = 'SELECT round_start_str FROM current_question'
-        const {rows: temp33} = await client25.query(sql33);
-        console.log('temp33', temp33);
-        var game_start_time = temp33[0].round_start_str;
-        console.log('game_start_time', game_start_time);
-        // var game_start_string = game_start_time.toString();
-        // console.log('game_start_string', game_start_string);
+            let sql33 = 'SELECT round_start_str FROM current_question'
+            const {rows: temp33} = await client25.query(sql33);
+            console.log('temp33', temp33);
+            var game_start_time = temp33[0].round_start_str;
+            console.log('game_start_time', game_start_time);
+            // var game_start_string = game_start_time.toString();
+            // console.log('game_start_string', game_start_string);
 
+            let sql29 = 'SELECT name, sum(points) AS total_score FROM player_guesses WHERE created_at > $1 AND name = $2 GROUP BY name'   
+            // let params29 = [ '2020-09-05 23:13:03', temp30[i].name ]  //HERE
+            let params29 = [ game_start_time, temp30[i].name ]  
 
-        let sql29 = 'SELECT name, sum(points) AS total_score FROM player_guesses WHERE created_at > $1 AND name = $2 GROUP BY name'   
-        // ^^ this is where to start tomorrow - put this in the loop below to add to the recent_guesses table
-        // 'LEFT JOIN recent_guesses ON recent_guesses.name = player_guesses.name'
-        // 'UPDATE '
-        // let params29 = [ '2020-09-05 23:13:03', temp30[i].name ]  //HERE
-        let params29 = [ game_start_time, temp30[i].name ]  
+            console.log('params29', params29)
+            const {rows: temp29} = await client25.query(sql29, params29 );
+            console.log('temp29', temp29) //cumulate scores of each player
 
-        console.log('params29', params29)
-        const {rows: temp29} = await client25.query(sql29, params29 );
-        console.log('temp29', temp29) //cumulate scores of each player
+            var player_score = temp29[0].total_score;
+            console.log('player_score', player_score);
 
-        var player_score = temp29[0].total_score;
-        console.log('player_score', player_score);
-
-        let sql31 = 'UPDATE recent_guesses SET cumulative_score = $1 WHERE name = $2' // use inner join to combine subset of recent_guesses with player_guesses
-        let params31 = [ temp29[0].total_score , temp30[i].name]
-        const {rows: temp31} = await client25.query(sql31, params31)
+            let sql31 = 'UPDATE recent_guesses SET cumulative_score = $1 WHERE name = $2' // use inner join to combine subset of recent_guesses with player_guesses
+            let params31 = [ temp29[0].total_score , temp30[i].name]
+            const {rows: temp31} = await client25.query(sql31, params31)
         } catch {
             console.log('player has not yet won a point:',temp30[i].name);
             let sql34 = 'UPDATE recent_guesses SET cumulative_score = $1 WHERE name = $2' // use inner join to combine subset of recent_guesses with player_guesses
@@ -648,13 +539,32 @@ app.put('/reveal_score/', async (req, res) => {
         }   
 
     };
-    // for i in 
     client25.release();
 
     // res.send(cumulative_scores)
     }
 
-    // console.log('reveal score code goes here');
+})
+
+
+app.get('/cumulative_scores/', async (req, res) => {  
+//sends the cumulative scores to score_page.js
+
+    try {
+        console.log('made it to line 443');
+        const client32 = await pool.connect();
+        let sql32 = 'SELECT name, cumulative_score FROM recent_guesses'
+        const {rows: name32} = await client32.query(sql32);
+        console.log('cumulative scores', name32);
+
+        cumulative_scores = JSON.stringify(name32)
+
+        res.send(cumulative_scores);
+        client32.release();
+    } catch (err) {
+        console.error(err);
+        res.send("Error on cumulative_scores side" + err);
+    }
 })
 
 
@@ -666,31 +576,29 @@ app.put('/clear_score/', async (req, res) => {
     console.log('player question', name);
 
     if (name === 'Natalie') {
-    const client25 = await pool.connect();
+        const client25 = await pool.connect();
 
-    let sql26 = 'SELECT id FROM current_question'
-    const  {rows: temp26}  = await client25.query(sql26); 
+        let sql26 = 'SELECT id FROM current_question'
+        const  {rows: temp26}  = await client25.query(sql26); 
 
-    let sql35 = 'UPDATE current_question SET round_start_str = $1 WHERE question_written = $2';
-    // let sql36 = 'SELECT NOW()' // convert this to GMT (greenwich mean time)
-    let sql36 = 'SELECT now()::timestamp' ; // set timezone setting postgres
+        let sql35 = 'UPDATE current_question SET round_start_str = $1 WHERE question_written = $2';
+        // let sql36 = 'SELECT NOW()' // convert this to GMT (greenwich mean time)
+        let sql36 = 'SELECT now()::timestamp' ; // set timezone setting postgres
 
-    const  {rows: temp36}  = await client25.query(sql36); 
+        const  {rows: temp36}  = await client25.query(sql36); 
 
-    let current_time = temp36[0].now;
-    console.log('current_time', current_time)
-    let params35 = [ current_time, 'Test']; 
-    console.log('params35', params35)
-    const  {rows: temp35}  = await client25.query(sql35, params35); 
-
-
+        let current_time = temp36[0].now;
+        console.log('current_time', current_time)
+        let params35 = [ current_time, 'Test']; 
+        console.log('params35', params35)
+        const  {rows: temp35}  = await client25.query(sql35, params35); 
 
     }
 })
 
 
 app.get('/retrieve_revealed_question/', async (req, res) => {
-// displays revieled question on score_page
+// displays revealed question on score_page
 
   try{
 
@@ -702,7 +610,7 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
     reveal_boolean = temp38[0].reveal_scores;
     console.log('reveal_boolean:', reveal_boolean);
 
-    if (reveal_boolean) {
+    if (reveal_boolean) { //checks that question is set to be revealed
 
     //reaches into current_question table to retrieve revealed_question
     var q_title = 'Test';
@@ -729,14 +637,6 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
     // return 
     client.release();
 
-    var name5_unbracketed = result.rows[0].id; //question id
-    var temp25 = JSON.stringify({id: name5_unbracketed})
-
-    console.log('temp25', temp25);
-    // return
-    // var combined_sender = Object.assign(temp25);
-    var combined_sender = JSON.stringify({id: result.rows[0].id});
-
     var combined_sender2 = ({reveal_score: 'yes', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
     console.log('combined', combined_sender2); 
     res.send(combined_sender2);
@@ -759,19 +659,11 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 app.put('/add_player/', async (req, res) => {
 // adds player to the cumulative score database
     let nametoadd = req.body.name_to_add;
-    console.log('nametoadd:', nametoadd)
     let add_or_remove = req.body.add_or_remove;
-    console.log('nametoadd', nametoadd);
-    console.log('add_or_remove', add_or_remove);
-
-
-    let nametoadd2 = 'Test4'
     let sql39;
     let client39; 
     try {
         client39 = await pool.connect();
-        let add_or_remove2 = JSON.stringify(add_or_remove.toString());  // problem here w converting to string
-        console.log('add_or_remove2', add_or_remove2);
         if (add_or_remove == 'add') {   
             console.log('Inside if statement')   
             sql39 = 'INSERT INTO recent_guesses(name) VALUES ($1)'
