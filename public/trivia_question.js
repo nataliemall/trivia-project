@@ -20,6 +20,7 @@ function refreshRetrieval() {
 }
 
 // var player_eval = 'test';
+//player score 
 
 // test
 function wasitcorrect(data){
