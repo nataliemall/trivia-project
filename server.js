@@ -223,6 +223,8 @@ app.get('/retrieve_question/', async (req, res) => {
 
     //reaches into current_question table to retrieve current question
     var q_title = 'Test';
+
+    console.log('q_title:', q_title);   // FIX from here 12/5/2020
     let sql_q_id = 'SELECT (id) FROM current_question WHERE question_written = $1';
     let q_params = [q_title];
     const q_client = await pool.connect();
@@ -275,6 +277,7 @@ app.put('/guess_update/', async (req, res) => {
     let params23 = [ name, ref_num ]
 
     const  temp23  = await client23.query(sql23, params23 ); 
+    client23.release();
     console.log('temp23', temp23.rows)
     //add error catch here for if more than one ID comes up (i.e. answered twice)
     
@@ -282,7 +285,6 @@ app.put('/guess_update/', async (req, res) => {
     console.log('temp23_ids', temp23_ids);
     // var guess_id_formatted23 = temp23_ids.id;
 
-    client23.release();
 
     console.log('temp_ids_after_release', temp23_ids);
 
@@ -375,7 +377,6 @@ app.put('/guess_update/', async (req, res) => {
         const client22 = await pool.connect();
         let sql14 = 'SELECT (id) FROM player_guesses WHERE name = $1 AND guess = $2 AND question = $3';
         const  temp  = await client22.query(sql14, params ); //this was where it went wonky - July 31 2020
-
         client22.release();
 
         const client11 = await pool.connect();
@@ -383,12 +384,12 @@ app.put('/guess_update/', async (req, res) => {
         let params11 = [ref_num];
         console.log(params11);
         const  { rows: test11 } = await client11.query(sql11, params11);
+        client11.release()
 
         console.log('test11', test11[0]);
         var answer_key = test11[0];
         var correct_answer = answer_key.correctanswer
         // client.release(); //changed from 'release' to 'end'  //this was a type release statement 
-        client11.release()
 
         if (correct_answer == guess) {
           console.log('answer was correct! direct to results page')
@@ -396,7 +397,7 @@ app.put('/guess_update/', async (req, res) => {
           // let sql12 = 'UPDATE (points) FROM player_guesses WHERE id = $1'
           let sql12 = 'UPDATE player_guesses SET points = 1 WHERE question = $1 AND name = $2';
           let params12 = [ref_num, name];
-          client12.query(sql12, params12);
+          const temp12 = await client12.query(sql12, params12);  //changed this to enforce await 
           client12.release();
 
           console.log(params11);
@@ -446,10 +447,10 @@ app.get('/player_scores/', async (req, res) => {
     // params = ['53']; //hard-coded for now - fix this
     let params = [ revealed_id_var ]
     const { rows: name13 } = await client13.query(sql13, params);
+    client13.release();
     // console.log('most recent guess', name13[0]);  //shouldn't the query have all the player_guesses?
     console.log('player guesses', name13);
 
-    client13.release();
 
     var player_name = name13[0];
     // player_name_json = JSON.stringify({name: player_name});
@@ -491,9 +492,10 @@ app.put('/reveal_score/', async (req, res) => {
 
     // re-accumulate total scores of active players: 
 
-    let sql28 = 'SELECT name FROM player_guesses WHERE question = $1';
-    const {rows: temp28} = await client25.query(sql28, params25 );
-    console.log('temp28', temp28);
+    // let sql28 = 'SELECT name FROM recent_guesses';      
+    // let sql28 = 'SELECT name FROM player_guesses WHERE question = $1';   // FIX this to only select names of current players 
+    // const {rows: temp28} = await client25.query(sql28 );
+    // console.log('temp28', temp28);
 
     // select names of everyone in recent_guesses 
     // select totals for each of those players 
@@ -592,6 +594,7 @@ app.put('/clear_score/', async (req, res) => {
         let params35 = [ current_time, 'Test']; 
         console.log('params35', params35)
         const  {rows: temp35}  = await client25.query(sql35, params35); 
+        client25.release()
 
     }
 })
