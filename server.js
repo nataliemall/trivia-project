@@ -62,6 +62,12 @@ app.put('/current_q_update/', async (req, res) => {
         let params38 = ['false'];
         const  {rows: temp38}  = await client24.query(sql38, params38); 
 
+        // update of reveal_current_scores here
+        let sql39 = 'UPDATE current_question SET reveal_current_scores = $1'
+        let params39 = ['false'];
+        const  {rows: temp39}  = await client24.query(sql39, params39); 
+
+
         let sql24 = 'UPDATE current_question SET id = $1';
         let params24 = [ question_id  ]
         const  temp23  = await client24.query(sql24, params24 ); 
@@ -431,6 +437,8 @@ app.get('/player_scores/', async (req, res) => {
   try {
 
     var q_title = 'Test';
+    // let sql_q_id = 'BLAH (revealed_question) FROM current_question WHERE question_written = $1';
+    // console.log('REACHED BROKEN SIDE')
     let sql_q_id = 'SELECT (revealed_question) FROM current_question WHERE question_written = $1';
     let q_params = [q_title];
     const q_client = await pool.connect();
@@ -460,15 +468,57 @@ app.get('/player_scores/', async (req, res) => {
     res.send(player_name_json);
   } catch (err) {
     console.error(err);
-    res.send("Error " + err);
+    res.status(500).send({ err : err.Error});
+    // res.send("Error " + err);  //look at documentation to have it become an error 500 type error
   } 
 })
 
 
+app.put('/reveal_current_score/', async (req, res) => { 
+    // add code for just the results from current question
+    console.log('test reveal_current_score')
+        try {
+
+        const name = req.body.name;
+        console.log('player question', name);
+
+        if (name === 'Natalie') {
+            const client26 = await pool.connect();
+
+            let sql37 = 'UPDATE current_question SET reveal_current_scores = $1'
+            let params37 = ['true'];
+            const  {rows: temp37}  = await client26.query(sql37, params37); 
+
+            let sql26 = 'SELECT id FROM current_question'
+            const  {rows: temp26}  = await client26.query(sql26); 
+
+            var question_to_reveal = temp26[0].id 
+            let sql25 = 'UPDATE current_question SET revealed_question = $1';
+            let params25 = [ question_to_reveal  ]
+            const  temp25  = await client26.query(sql25, params25 );
+
+            client26.release();
+
+
+            } 
+        else {
+            console.log('incorrect username')
+        }
+        } catch {
+            res.status(500).send({ err : err.Error});
+        }
+
+ } )
+
+
 app.put('/reveal_score/', async (req, res) => {  
+    // change to only calculate cumulative score from entire game 
+
 // updates revealed_question column of current_question data table 
 // to reveal score of new question
 // will also re-accumulate total scores of active players 
+    
+    try {
 
     const name = req.body.name;
     console.log('player question', name);
@@ -542,8 +592,13 @@ app.put('/reveal_score/', async (req, res) => {
 
     };
     client25.release();
+    
+    }
 
     // res.send(cumulative_scores)
+    } catch {
+        console.error('something went wrong with score updates');
+        res.status(500).send({ err : err.Error});
     }
 
 })
@@ -606,48 +661,59 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
   try{
 
     const q_client = await pool.connect();
-    let sql38 = 'SELECT reveal_scores FROM current_question WHERE question_written = $1'
+    let sql38 = 'SELECT reveal_scores, reveal_current_scores FROM current_question WHERE question_written = $1'
     let params38 = ['Test'];
     const { rows: temp38 } = await q_client.query(sql38, params38)
 
     reveal_boolean = temp38[0].reveal_scores;
+    reveal_current_boolean = temp38[0].reveal_current_scores;
     console.log('reveal_boolean:', reveal_boolean);
 
-    if (reveal_boolean) { //checks that question is set to be revealed
+    if (reveal_boolean || reveal_current_boolean) { //checks that question is set to be revealed
 
-    //reaches into current_question table to retrieve revealed_question
-    var q_title = 'Test';
-    let sql_q_id = 'SELECT (revealed_question) FROM current_question WHERE question_written = $1';
-    let q_params = [q_title];
-    const { rows: q_name } = await q_client.query(sql_q_id, q_params)
-    q_client.release();    
-    var q_unbracketed = q_name[0];
-    console.log('q_unbracketed', q_unbracketed);
+        //reaches into current_question table to retrieve revealed_question
+        var q_title = 'Test';
+        let sql_q_id = 'SELECT (revealed_question) FROM current_question WHERE question_written = $1';
+        let q_params = [q_title];
+        const { rows: q_name } = await q_client.query(sql_q_id, q_params)
+        q_client.release();    
+        var q_unbracketed = q_name[0];
+        console.log('q_unbracketed', q_unbracketed);
 
-    var revealed_id_var = q_unbracketed.revealed_question;
-    console.log('revealed_id_var', revealed_id_var);
+        var revealed_id_var = q_unbracketed.revealed_question;
+        console.log('revealed_id_var', revealed_id_var);
 
-    let sql = 'SELECT id, question, answera, answerb, answerc, answerd, correctanswer FROM trivia_questions WHERE id = $1';
+        let sql = 'SELECT id, question, answera, answerb, answerc, answerd, correctanswer FROM trivia_questions WHERE id = $1';
 
-    // let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
-    let params = [revealed_id_var];
+        // let sql5 = 'SELECT (id) FROM trivia_questions WHERE id = $1';
+        let params = [revealed_id_var];
 
-    const client = await pool.connect();
-    const result = await client.query(sql, params);
-    // const temp123 = await client.query(sql, params)
-    // const name = temp123.rows;
-    console.log('result', result)
-    // return 
-    client.release();
+        const client = await pool.connect();
+        const result = await client.query(sql, params);
+        // const temp123 = await client.query(sql, params)
+        // const name = temp123.rows;
+        console.log('result', result)
+        // return 
+        client.release();
 
-    var combined_sender2 = ({reveal_score: 'yes', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
-    console.log('combined', combined_sender2); 
-    res.send(combined_sender2);
+
+
+        
+        if (reveal_current_boolean) { // reveal just for current question
+            var combined_sender2 = ({reveal_current: 'yes', reveal_score: 'no', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
+            console.log('Will just reveal current question scores')
+        } else { // reveal entire scoreboard
+            var combined_sender2 = ({reveal_current: 'yes', reveal_score: 'yes', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
+            console.log('combined', combined_sender2); 
+        }
+        res.send(combined_sender2);
+
     } else {
         // send an alternate version of combines_sender2 that says not to send data over 
         var combined_sender2 = ({reveal_score: 'no'});
         console.log('combined', combined_sender2); 
         res.send(combined_sender2)
+        q_client.release();
 
     }
   } catch (err) {

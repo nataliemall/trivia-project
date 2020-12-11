@@ -50,6 +50,60 @@ function displayMessage(message1) {
 
 refreshDisplay();
 
+change_5x_button.addEventListener('click', () => {
+// admin clicks to change question 
+
+    // const jsonstring2 = '{"mykey": "' + (document.getElementById('happy_thought').value) + '"}'; //this worked
+
+    const name = document.getElementById('name').value;
+    const question_id = document.getElementById('correct_answer').value
+
+    const mykey2 = { "name" : name, "question_id" : question_id }
+    console.log(mykey2)
+
+    const bobcatStr = JSON.stringify(mykey2);
+    console.log(bobcatStr);
+
+    var response_text = "";
+    const submission_response = document.getElementById('submission_response');
+
+    function change_question() {
+
+      fetch('/current_q_update/', {
+        method: 'PUT',
+        // body: JSON.stringify(jsonConst),
+        // body: '{"mykey": "bigcat2"}',
+        body: bobcatStr,
+        headers: {
+        // 'Accept': 'application/json',
+        'Content-Type': 'application/json'
+        // 'Content-Type': 'text/plain'
+
+        // 'Content-Type': 'application/x-www-form-urlencoded',
+        } 
+        }).then((result) => result.json()
+        ).then((variable) => {
+          try{
+            console.log('question update:', variable)
+            var response_text = JSON.stringify(variable.response);
+            console.log('question text:', variable.response);
+
+
+            submission_response.innerHTML = response_text;
+          } catch {
+            console.log('Something else went wrong')
+          }
+
+        });
+    }
+
+    change_question()
+
+    console.log('TEST');
+    })
+
+
+
 
 submit_button.addEventListener('click', () => {
 // admin clicks to change question 
@@ -98,8 +152,8 @@ submit_button.addEventListener('click', () => {
     console.log('TEST');
     })
 
-score_button.addEventListener('click', () => {
-//admin clicks to reveal score
+total_score_button.addEventListener('click', () => {
+//admin clicks to reveal total score
 
   function refreshDisplay() {
 
@@ -125,6 +179,68 @@ score_button.addEventListener('click', () => {
   refreshDisplay()
 
   });
+
+current_score_button.addEventListener('click', () => {
+//admin clicks to reveal CURRENT score (much less likely to crash)
+
+  function refreshDisplay() {
+
+    fetch('/reveal_current_score/', {
+          method: 'PUT',
+          body: bobcatStr,
+          headers: {
+          'Content-Type': 'application/json'
+          } 
+          }
+          )
+
+    }
+
+  const name = document.getElementById('name').value;
+  // var name = 'test_name'
+  const mykey2 = { "name" : name }     
+  console.log("mykey2", mykey2)
+
+  const bobcatStr = JSON.stringify(mykey2);
+  console.log(bobcatStr);      
+
+  refreshDisplay()
+
+  });
+
+test_button.addEventListener('click', () => {
+//admin clicks to reveal score x 5 
+
+  function refreshDisplay() {
+
+    fetch('/reveal_score/', {
+          method: 'PUT',
+          body: bobcatStr,
+          headers: {
+          'Content-Type': 'application/json'
+          } 
+          }
+          )
+
+    }
+
+  const name = document.getElementById('name').value;
+  // var name = 'test_name'
+  const mykey2 = { "name" : name }     
+  console.log("mykey2", mykey2)
+
+  const bobcatStr = JSON.stringify(mykey2);
+  console.log(bobcatStr);      
+
+  refreshDisplay()
+  refreshDisplay()
+  refreshDisplay()
+  refreshDisplay()
+  refreshDisplay()
+
+  });
+
+
 
 start_new.addEventListener('click', () => {
 // fetch something from server that replaces the current_question.round_start with now()

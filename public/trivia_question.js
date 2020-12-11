@@ -275,10 +275,12 @@ var reveal_score = 'yes';
 async function displayQuestion(message1) { 
 
   var reveal_score = message1.reveal_score
+  var reveal_current = message1.reveal_current
   console.log('displayQuestion reveal_score:', reveal_score)
+  console.log('displayQuestion reveal_current:', reveal_current)
   displayTitle.innerHTML = '' //blank when question not yet revealed
 
-  if (reveal_score == 'yes') {
+  if (reveal_current == 'yes') {
 
     console.log('message1', message1);
     // console.log(message1[1])
@@ -317,7 +319,7 @@ async function displayQuestion(message1) {
       console.log('score not to be revealed at this time')
   }
 
-    return reveal_score;
+    return reveal_current;
   }
 
 
@@ -349,15 +351,16 @@ async function refreshDisplay() {
       )
     .catch(error => console.log('There was an error', error))
 }
+//^ this is a good example
+// look at heroku starting guide
 
 
 
-
-function displayMessage(scores, reveal_score) {   // displays players' most recent guesses 
+function displayMessage(scores, reveal_current) {   // displays players' most recent guesses 
   // console.log('scores', scores);
   // console.log(scores[0])
 
-  console.log('reveal_score from displayMessage', reveal_score);
+  console.log('reveal_score from displayMessage', reveal_current);
   var table = document.getElementById("scoreTable");
   console.log('table', table);
 
@@ -378,7 +381,7 @@ function displayMessage(scores, reveal_score) {   // displays players' most rece
 
   }
   var testReturn = 'Test return_thing'
-  return reveal_score
+  return reveal_current
 
 }
 
@@ -388,20 +391,20 @@ function foo(thing) {
   return foodie
 }
 
-async function display_results(reveal_score) {
-    if (reveal_score == 'yes') {
+async function display_results(reveal_current) {  //reveals results from current question  
+    if (reveal_current == 'yes') {
 
     return fetch('/player_scores/')  //how to put a return here without breaking - Pandu
     .then(result => 
       result.json() // console.log(result) 
       // console.log('result:', result)
       )
-    .then(data => displayMessage(data, reveal_score)
+    .then(data => displayMessage(data, reveal_current)
       )
     .catch(error => console.log('There was an error', error));
     } else {
       console.log('not set to reveal the score')
-      return reveal_score
+      return reveal_current 
     }
 
 };
@@ -507,14 +510,18 @@ function display_cumulative_scores(reveal_score) {
 
 
 function display_updates() {
-  refreshDisplay() // retrieves and displaysthe revealed past question
-  .then((reveal_score) => {
-    console.log('reveal_score', reveal_score); 
-    return display_results(reveal_score)}  //retrieves and displayes and most recent guesses 
-  ).then((reveal_score) => {display_cumulative_scores(reveal_score) //retrieves and displays past scores
-    console.log('test thing from display_cumulative_scores', reveal_score)
-  })
+  refreshDisplay() // retrieves and displays the revealed past question
+  .then((reveal_current) => {
+
+    console.log('reveal_current', reveal_current); 
+    return display_results(reveal_current)}  //retrieves and displayes and most recent guesses 
+  )
 }
+
+// do this in a separate function: 
+  // .then((reveal_score) => {display_cumulative_scores(reveal_score) //retrieves and displays past scores
+  //   console.log('test thing from display_cumulative_scores', reveal_score)
+  // })
 
   
   display_updates()
