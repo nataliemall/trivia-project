@@ -270,7 +270,24 @@ console.log('hello from the score_page')
 const displayTitle = document.getElementById('recentQuestionResults')
 const displayPastQuestion = document.getElementById('past_question');
 const answers = document.getElementById('past_answers');
-var reveal_score = 'yes';
+var reveal_score = 'no';
+
+
+//table head creator 
+function generateTableHead(table, data) {
+  let thead = table.createTHead();
+  // thead.style.color = 'dark blue';
+  thead.style.textAlign = 'left';
+
+  let row = thead.insertRow();
+    
+  for (let key of data) {
+    let th = document.createElement("th");
+    let text = document.createTextNode(key);
+    th.appendChild(text);
+    row.appendChild(th);
+  }
+}
 
 async function displayQuestion(message1) { 
 
@@ -294,11 +311,6 @@ async function displayQuestion(message1) {
     function generateTableHead(table) {
       let thead = table.createTHead();
       let row = thead.insertRow();
-        // let th = document.createElement("th");
-        // let text = document.createTextNode(key);
-        // th.appendChild(text);
-        // row.appendChild(th);
-
       for (let key of data) {
         let th = document.createElement("th");
         let text = document.createTextNode(key);
@@ -323,25 +335,6 @@ async function displayQuestion(message1) {
   }
 
 
-//table head creator 
-function generateTableHead(table, data) {
-  let thead = table.createTHead();
-  // thead.style.color = 'dark blue';
-  thead.style.textAlign = 'left';
-
-  let row = thead.insertRow();
-    // let th = document.createElement("th");
-    // let text = document.createTextNode(key);
-    // th.appendChild(text);
-    // row.appendChild(th);
-    
-  for (let key of data) {
-    let th = document.createElement("th");
-    let text = document.createTextNode(key);
-    th.appendChild(text);
-    row.appendChild(th);
-  }
-}
 
 async function refreshDisplay() {
   return fetch('/retrieve_revealed_question/') // gets /api/messages (GET is the default)
@@ -360,7 +353,7 @@ function displayMessage(scores, reveal_current) {   // displays players' most re
   // console.log('scores', scores);
   // console.log(scores[0])
 
-  console.log('reveal_score from displayMessage', reveal_current);
+  console.log('reveal_current from displayMessage', reveal_current);
   var table = document.getElementById("scoreTable");
   console.log('table', table);
 
@@ -525,6 +518,8 @@ function display_updates() {
 
   
   display_updates()
+
+  display_cumulative_scores(reveal_score)   // will run if reveal_score is a yes
   
   //retrieves revealed question
 

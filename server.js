@@ -655,7 +655,7 @@ app.put('/clear_score/', async (req, res) => {
 })
 
 
-app.get('/retrieve_revealed_question/', async (req, res) => {
+app.get('/retrieve_revealed_question/', async (req, res) => {  //split into retrieve_revealed_question and retrieve_all_scores
 // displays revealed question on score_page
 
   try{
@@ -699,11 +699,11 @@ app.get('/retrieve_revealed_question/', async (req, res) => {
 
 
         
-        if (reveal_current_boolean) { // reveal just for current question
-            var combined_sender2 = ({reveal_current: 'yes', reveal_score: 'no', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
-            console.log('Will just reveal current question scores')
-        } else { // reveal entire scoreboard
+        if (reveal_boolean) { // reveal entire scoreboard
             var combined_sender2 = ({reveal_current: 'yes', reveal_score: 'yes', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
+            console.log('Will just reveal current question scores')
+        } else { // eveal just for current question  
+            var combined_sender2 = ({reveal_current: 'yes', reveal_score: 'no', id: result.rows[0].id, question: result.rows[0].question, answera: result.rows[0].answera, answerb: result.rows[0].answerb, answerc: result.rows[0].answerc, answerd: result.rows[0].answerd, correctanswer : result.rows[0].correctanswer })
             console.log('combined', combined_sender2); 
         }
         res.send(combined_sender2);
